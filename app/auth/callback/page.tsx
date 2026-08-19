@@ -1,4 +1,4 @@
-import { setAuthToken } from "../actions/auth";
+import { setAuthToken } from "@/app/actions/auth";
 
 export default async function AuthCallback({
   searchParams,
