@@ -1,4 +1,4 @@
-import { setAuthToken } from "@/app/actions/auth";
+import { CallbackForm } from "@/components/CallbackForm";
 
 export default async function AuthCallback({
   searchParams,
@@ -11,5 +11,5 @@ export default async function AuthCallback({
     return <p>Нет токена</p>;
   }
 
-  await setAuthToken(token);
+  return <CallbackForm token={token} />;
 }
