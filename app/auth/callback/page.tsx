@@ -1,6 +1,4 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
-import { verifyToken } from "@/lib/auth";
+import { setAuthToken } from "../actions/auth";
 
 export default async function AuthCallback({
   searchParams,
@@ -10,22 +8,8 @@ export default async function AuthCallback({
   const { token } = await searchParams;
 
   if (!token) {
-    redirect("/");
+    return <p>Нет токена</p>;
   }
 
-  const payload = verifyToken(token);
-  if (!payload) {
-    redirect("/");
-  }
-
-  const store = await cookies();
-  store.set("token", token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: 30 * 24 * 60 * 60,
-    path: "/",
-  });
-
-  redirect("/");
+  await setAuthToken(token);
 }

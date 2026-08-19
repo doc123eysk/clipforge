@@ -20,8 +20,8 @@ module.exports = {
     },
     {
       name: "clipforge-worker",
-      script: "node_modules/.bin/tsx",
-      args: "worker.ts",
+      script: "npx",
+      args: "tsx worker.ts",
       cwd: "/var/www/clipforge",
       instances: 1,
       exec_mode: "fork",
