@@ -246,14 +246,14 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
             {clips.map((clip) => (
               <div key={clip.id} className="glass card-glow rounded-lg sm:rounded-xl overflow-hidden cursor-pointer group" onClick={() => clip.status === "ready" && setPreviewClip(clip)}>
                 {clip.status === "ready" ? (
-                  <div className="relative aspect-[9/16] max-h-36 sm:max-h-44 overflow-hidden">
-                    <video src={`/api/clips/${clip.id}/preview`} className="w-full h-full object-cover" muted preload="metadata" />
+                  <div className="relative aspect-[9/16] overflow-hidden">
+                    <video src={`/api/clips/${clip.id}/preview`} className="absolute inset-0 h-full w-full object-cover" muted preload="metadata" />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
                       <svg className="opacity-0 group-hover:opacity-100 transition" width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3" /></svg>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex aspect-[9/16] max-h-36 sm:max-h-44 items-center justify-center bg-white/5">
+                  <div className="flex aspect-[9/16] items-center justify-center bg-white/5">
                     {clip.status === "error" ? (
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                     ) : (
@@ -282,9 +282,9 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
 
       {previewClip && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setPreviewClip(null)}>
-          <div className="relative max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
-            <video ref={previewRef} src={`/api/clips/${previewClip.id}/preview`} controls autoPlay className="w-full rounded-2xl shadow-2xl" />
-            <div className="mt-3 flex items-center justify-between text-sm text-zinc-400">
+          <div className="relative w-full max-w-[22rem] aspect-[9/16]" onClick={(e) => e.stopPropagation()}>
+            <video ref={previewRef} src={`/api/clips/${previewClip.id}/preview`} controls autoPlay className="absolute inset-0 h-full w-full rounded-2xl shadow-2xl object-cover" />
+            <div className="absolute -bottom-12 left-0 right-0 flex items-center justify-between text-sm text-zinc-400">
               <span>{formatDuration(previewClip.startSec)} - {formatDuration(previewClip.endSec)}</span>
               <div className="flex gap-2">
                 <a href={`/api/clips/${previewClip.id}/preview`} download className="rounded-lg bg-indigo-500/20 px-3 py-1.5 text-xs text-indigo-300 transition hover:bg-indigo-500/30">Скачать</a>
