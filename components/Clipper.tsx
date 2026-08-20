@@ -15,6 +15,7 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
   const seekRef = useRef<HTMLDivElement>(null);
+  const previewRef = useRef<HTMLVideoElement>(null);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [activeSeg, setActiveSeg] = useState<string | null>(null);
   const [clips, setClips] = useState<Clip[]>(initialClips);
@@ -23,6 +24,7 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   const [currentTime, setCurrentTime] = useState(0);
   const [scrubbing, setScrubbing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previewClip, setPreviewClip] = useState<Clip | null>(null);
   const rafRef = useRef<number>(0);
 
   const dur = video.durationSec;
@@ -39,6 +41,15 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
     rafRef.current = requestAnimationFrame(tick);
     return () => { running = false; cancelAnimationFrame(rafRef.current); };
   }, []);
+
+  useEffect(() => {
+    if (!previewClip) return;
+    const v = previewRef.current;
+    if (v) { v.currentTime = 0; v.play().catch(() => {}); }
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPreviewClip(null); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [previewClip]);
 
   const seekFromPointer = useCallback((clientX: number) => {
     if (!seekRef.current || !videoRef.current) return;
@@ -220,8 +231,8 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
             {segments.map((seg) => (
               <div key={seg.id} className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/5 px-3 py-1.5 text-xs">
                 <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
-                <span className="text-zinc-400">{formatDuration(seg.start)} – {formatDuration(seg.end)}</span>
-                <button onClick={() => removeSegment(seg.id)} className="ml-1 text-zinc-600 hover:text-red-400">×</button>
+                <span className="text-zinc-400">{formatDuration(seg.start)} - {formatDuration(seg.end)}</span>
+                <button onClick={() => removeSegment(seg.id)} className="ml-1 text-zinc-600 hover:text-red-400">&times;</button>
               </div>
             ))}
           </div>
@@ -231,17 +242,22 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
       {clips.length > 0 && (
         <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
           <h3 className="mb-4 font-semibold text-zinc-200">Клипы ({clips.length})</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 sm:gap-3">
             {clips.map((clip) => (
-              <div key={clip.id} className="glass card-glow rounded-lg sm:rounded-xl overflow-hidden">
+              <div key={clip.id} className="glass card-glow rounded-lg sm:rounded-xl overflow-hidden cursor-pointer group" onClick={() => clip.status === "ready" && setPreviewClip(clip)}>
                 {clip.status === "ready" ? (
-                  <video src={`/api/clips/${clip.id}/preview`} className="aspect-[9/16] w-full object-cover" muted />
+                  <div className="relative aspect-[9/16] max-h-36 sm:max-h-44 overflow-hidden">
+                    <video src={`/api/clips/${clip.id}/preview`} className="w-full h-full object-cover" muted preload="metadata" />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-center justify-center">
+                      <svg className="opacity-0 group-hover:opacity-100 transition" width="28" height="28" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3" /></svg>
+                    </div>
+                  </div>
                 ) : (
-                  <div className="flex aspect-[9/16] items-center justify-center bg-white/5">
+                  <div className="flex aspect-[9/16] max-h-36 sm:max-h-44 items-center justify-center bg-white/5">
                     {clip.status === "error" ? (
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
                     ) : (
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2">
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2">
                         <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset={32 - (clip.progress / 100) * 32}>
                           <animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite" />
                         </circle>
@@ -250,9 +266,9 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
                   </div>
                 )}
                 <div className="p-2">
-                  <p className="text-[10px] text-zinc-500">{formatDuration(clip.startSec)} – {formatDuration(clip.endSec)}</p>
+                  <p className="text-[10px] text-zinc-500">{formatDuration(clip.startSec)} - {formatDuration(clip.endSec)}</p>
                   {clip.status === "ready" && (
-                    <a href={`/api/clips/${clip.id}/preview`} download className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-indigo-500/20 py-1 text-[10px] text-indigo-300 transition hover:bg-indigo-500/30">
+                    <a href={`/api/clips/${clip.id}/preview`} download onClick={(e) => e.stopPropagation()} className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-indigo-500/20 py-1 text-[10px] text-indigo-300 transition hover:bg-indigo-500/30">
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                       Скачать
                     </a>
@@ -260,6 +276,21 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {previewClip && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4" onClick={() => setPreviewClip(null)}>
+          <div className="relative max-w-sm w-full" onClick={(e) => e.stopPropagation()}>
+            <video ref={previewRef} src={`/api/clips/${previewClip.id}/preview`} controls autoPlay className="w-full rounded-2xl shadow-2xl" />
+            <div className="mt-3 flex items-center justify-between text-sm text-zinc-400">
+              <span>{formatDuration(previewClip.startSec)} - {formatDuration(previewClip.endSec)}</span>
+              <div className="flex gap-2">
+                <a href={`/api/clips/${previewClip.id}/preview`} download className="rounded-lg bg-indigo-500/20 px-3 py-1.5 text-xs text-indigo-300 transition hover:bg-indigo-500/30">Скачать</a>
+                <button onClick={() => setPreviewClip(null)} className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-zinc-300 transition hover:bg-white/20">Закрыть</button>
+              </div>
+            </div>
           </div>
         </div>
       )}
