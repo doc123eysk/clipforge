@@ -9,6 +9,8 @@ interface Settings {
   limits: { maxVideoDurationFree: number; maxVideoDurationPro: number; maxClipDuration: number; maxClipsPerVideoFree: number; maxClipsPerVideoPro: number; guestDailyLimit: number; guestVideoExpiryHours: number };
   pricing: { monthlyPrice: number; quarterlyDiscount: number; halfyearDiscount: number; yearlyDiscount: number; promoCode: string; promoDiscount: number; promoEnabled: boolean };
   general: { siteName: string; supportEmail: string; maintenance: boolean };
+  yandexKassa: { shopId: string; secretKey: string; enabled: boolean };
+  s3: { endpoint: string; bucket: string; region: string; accessKey: string; secretKey: string; publicUrl: string; enabled: boolean };
 }
 
 const DEFAULTS: Settings = {
@@ -16,6 +18,8 @@ const DEFAULTS: Settings = {
   limits: { maxVideoDurationFree: 600, maxVideoDurationPro: 7200, maxClipDuration: 60, maxClipsPerVideoFree: 6, maxClipsPerVideoPro: 50, guestDailyLimit: 6, guestVideoExpiryHours: 1 },
   pricing: { monthlyPrice: 399, quarterlyDiscount: 10, halfyearDiscount: 15, yearlyDiscount: 30, promoCode: "", promoDiscount: 0, promoEnabled: false },
   general: { siteName: "ClipForge", supportEmail: "", maintenance: false },
+  yandexKassa: { shopId: "", secretKey: "", enabled: false },
+  s3: { endpoint: "", bucket: "", region: "ru-msk", accessKey: "", secretKey: "", publicUrl: "", enabled: false },
 };
 
 function Field({ label, value, onChange, type = "text", placeholder, secret }: {
@@ -132,6 +136,26 @@ export default function AdminSettingsPage() {
               <Field label="Скидка %" value={String(settings.pricing.promoDiscount)} onChange={(v) => update("pricing", "promoDiscount", Number(v))} type="number" />
             </div>
           )}
+        </Section>
+
+        <Section title="Яндекс Касса">
+          <Toggle label="Включена" checked={settings.yandexKassa.enabled} onChange={(v) => update("yandexKassa", "enabled", v)} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Shop ID" value={settings.yandexKassa.shopId} onChange={(v) => update("yandexKassa", "shopId", v)} placeholder="123456" />
+            <Field label="Секретный ключ" value={settings.yandexKassa.secretKey} onChange={(v) => update("yandexKassa", "secretKey", v)} secret placeholder="live_..." />
+          </div>
+        </Section>
+
+        <Section title="S3 хранилище">
+          <Toggle label="Включено" checked={settings.s3.enabled} onChange={(v) => update("s3", "enabled", v)} />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Endpoint" value={settings.s3.endpoint} onChange={(v) => update("s3", "endpoint", v)} placeholder="https://s3.elitecloud.ru" />
+            <Field label="Bucket" value={settings.s3.bucket} onChange={(v) => update("s3", "bucket", v)} placeholder="clipforge" />
+            <Field label="Region" value={settings.s3.region} onChange={(v) => update("s3", "region", v)} placeholder="ru-msk" />
+            <Field label="Public URL" value={settings.s3.publicUrl} onChange={(v) => update("s3", "publicUrl", v)} placeholder="https://cdn.clipforge.ru" />
+            <Field label="Access Key" value={settings.s3.accessKey} onChange={(v) => update("s3", "accessKey", v)} secret />
+            <Field label="Secret Key" value={settings.s3.secretKey} onChange={(v) => update("s3", "secretKey", v)} secret />
+          </div>
         </Section>
       </div>
       <div className="mt-6 sm:mt-8 flex justify-end">

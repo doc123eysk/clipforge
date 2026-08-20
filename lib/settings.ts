@@ -35,6 +35,20 @@ export interface AppSettings {
     supportEmail: string;
     maintenance: boolean;
   };
+  yandexKassa: {
+    shopId: string;
+    secretKey: string;
+    enabled: boolean;
+  };
+  s3: {
+    endpoint: string;
+    bucket: string;
+    region: string;
+    accessKey: string;
+    secretKey: string;
+    publicUrl: string;
+    enabled: boolean;
+  };
 }
 
 const DEFAULTS: AppSettings = {
@@ -58,6 +72,8 @@ const DEFAULTS: AppSettings = {
     promoEnabled: false,
   },
   general: { siteName: "ClipForge", supportEmail: "", maintenance: false },
+  yandexKassa: { shopId: "", secretKey: "", enabled: false },
+  s3: { endpoint: "", bucket: "", region: "ru-msk", accessKey: "", secretKey: "", publicUrl: "", enabled: false },
 };
 
 export async function getSettings(): Promise<AppSettings> {
@@ -77,6 +93,8 @@ export async function saveSettings(settings: Partial<AppSettings>): Promise<void
     limits: { ...current.limits, ...settings.limits },
     pricing: { ...current.pricing, ...settings.pricing },
     general: { ...current.general, ...settings.general },
+    yandexKassa: { ...current.yandexKassa, ...settings.yandexKassa },
+    s3: { ...current.s3, ...settings.s3 },
   };
   await writeFile(SETTINGS_PATH, JSON.stringify(merged, null, 2));
 }
