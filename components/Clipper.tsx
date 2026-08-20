@@ -19,8 +19,24 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   const [clips, setClips] = useState<Clip[]>(initialClips);
   const [creating, setCreating] = useState(false);
   const [dragging, setDragging] = useState<{ segId: string; side: "start" | "end" } | null>(null);
+  const [currentTime, setCurrentTime] = useState(0);
 
   const dur = video.durationSec;
+
+  useEffect(() => {
+    const v = videoRef.current;
+    if (!v) return;
+    const onTime = () => setCurrentTime(v.currentTime);
+    v.addEventListener("timeupdate", onTime);
+    return () => v.removeEventListener("timeupdate", onTime);
+  }, []);
+
+  const seekVideo = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!timelineRef.current || !videoRef.current) return;
+    const rect = timelineRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    videoRef.current.currentTime = x * dur;
+  };
 
   const addSegment = () => {
     if (segments.length >= maxClips) return;
@@ -104,6 +120,8 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
     return () => clearInterval(iv);
   }, [clips]);
 
+  const playheadPct = dur > 0 ? (currentTime / dur) * 100 : 0;
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <video ref={videoRef} src={`/api/videos/${video.id}/stream`} controls className="mx-auto max-h-[40vh] sm:max-h-[50vh] rounded-xl sm:rounded-2xl w-full" />
@@ -121,16 +139,26 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
           </div>
         </div>
 
-        <div ref={timelineRef} className="relative h-10 sm:h-12 rounded-xl bg-white/5 touch-none">
+        <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
+          <span>{formatDuration(currentTime)}</span>
+          <span>/</span>
+          <span>{formatDuration(dur)}</span>
+        </div>
+
+        <div ref={timelineRef} className="relative h-10 sm:h-12 rounded-xl bg-white/5 touch-none cursor-pointer" onClick={seekVideo}>
           {segments.map((seg) => (
             <div key={seg.id} className={`absolute top-0 h-full cursor-pointer rounded-lg transition ${activeSeg === seg.id ? "ring-2 ring-white/40" : ""}`}
               style={{ left: `${(seg.start / dur) * 100}%`, width: `${((seg.end - seg.start) / dur) * 100}%`, backgroundColor: seg.color + "33", borderLeft: `3px solid ${seg.color}`, borderRight: `3px solid ${seg.color}` }}
-              onClick={() => setActiveSeg(seg.id)}>
+              onClick={(e) => { e.stopPropagation(); setActiveSeg(seg.id); }}>
               <div className="absolute -top-6 left-0 text-[10px] text-zinc-400 hidden sm:block">{formatDuration(seg.start)}</div>
               <div className="absolute h-4 w-2 sm:h-3 sm:w-1.5 cursor-ew-resize rounded-l bg-white/60 left-0 top-1/2 -translate-y-1/2 -ml-0.5" onMouseDown={(e) => onTimelineMouseDown(e, seg.id, "start")} onTouchStart={(e) => onTimelineMouseDown(e, seg.id, "start")} />
               <div className="absolute h-4 w-2 sm:h-3 sm:w-1.5 cursor-ew-resize rounded-r bg-white/60 right-0 top-1/2 -translate-y-1/2 -mr-0.5" onMouseDown={(e) => onTimelineMouseDown(e, seg.id, "end")} onTouchStart={(e) => onTimelineMouseDown(e, seg.id, "end")} />
             </div>
           ))}
+
+          <div className="absolute top-0 h-full w-0.5 bg-white pointer-events-none z-10" style={{ left: `${playheadPct}%` }}>
+            <div className="absolute -top-1 left-1/2 -translate-x-1/2 h-2.5 w-2.5 rounded-full bg-white shadow-lg shadow-white/30" />
+          </div>
         </div>
 
         {segments.length > 0 && (
