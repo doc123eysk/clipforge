@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { setAuthToken } from "@/app/actions/auth";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -71,7 +70,13 @@ export function AuthButton({ email: initialEmail, kind: initialKind }: Props) {
       const data = await res.json();
       if (!res.ok || !data.token) throw new Error(data.error);
       toast.success("Добро пожаловать!");
-      await setAuthToken(data.token);
+      const cookieRes = await fetch("/api/auth/set-cookie", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token: data.token }),
+      });
+      if (!cookieRes.ok) throw new Error("Cookie failed");
+      window.location.href = "/";
     } catch (e: any) { toast.error(e.message || "Неверный код"); }
     finally { setLoading(false); }
   }
