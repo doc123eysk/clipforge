@@ -60,8 +60,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <main className="flex-1">{children}</main>
 
         <footer className="border-t border-white/5 py-6 sm:py-8 text-center text-xs text-zinc-600">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <span className="gradient-text font-medium">ClipForge</span> — нарезка видео на shorts
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+            <span><span className="gradient-text font-medium">ClipForge</span> — нарезка видео на shorts</span>
+            <span className="hidden sm:inline text-zinc-700">·</span>
+            <a href="/legal" className="hover:text-zinc-400 transition">Реквизиты</a>
           </div>
         </footer>
       </body>

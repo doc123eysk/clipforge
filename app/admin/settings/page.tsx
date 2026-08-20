@@ -11,6 +11,7 @@ interface Settings {
   general: { siteName: string; supportEmail: string; maintenance: boolean };
   yandexKassa: { shopId: string; secretKey: string; enabled: boolean };
   s3: { endpoint: string; bucket: string; region: string; accessKey: string; secretKey: string; publicUrl: string; enabled: boolean };
+  legal: { entityType: string; fullName: string; inn: string; ogrn: string; legalAddress: string; actualAddress: string; phone: string; email: string; bankName: string; bik: string; corrAccount: string; bankAccount: string };
 }
 
 const DEFAULTS: Settings = {
@@ -20,6 +21,7 @@ const DEFAULTS: Settings = {
   general: { siteName: "ClipForge", supportEmail: "", maintenance: false },
   yandexKassa: { shopId: "", secretKey: "", enabled: false },
   s3: { endpoint: "", bucket: "", region: "ru-msk", accessKey: "", secretKey: "", publicUrl: "", enabled: false },
+  legal: { entityType: "Индивидуальный предприниматель", fullName: "", inn: "", ogrn: "", legalAddress: "", actualAddress: "", phone: "", email: "", bankName: "", bik: "", corrAccount: "", bankAccount: "" },
 };
 
 function Field({ label, value, onChange, type = "text", placeholder, secret }: {
@@ -155,6 +157,25 @@ export default function AdminSettingsPage() {
             <Field label="Public URL" value={settings.s3.publicUrl} onChange={(v) => update("s3", "publicUrl", v)} placeholder="https://cdn.clipforge.ru" />
             <Field label="Access Key" value={settings.s3.accessKey} onChange={(v) => update("s3", "accessKey", v)} secret />
             <Field label="Secret Key" value={settings.s3.secretKey} onChange={(v) => update("s3", "secretKey", v)} secret />
+          </div>
+        </Section>
+
+        <Section title="Реквизиты (для Яндекс Кассы)">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Тип лица" value={settings.legal.entityType} onChange={(v) => update("legal", "entityType", v)} placeholder="ИП / ООО / Самозанятый" />
+            <Field label="ФИО / Название" value={settings.legal.fullName} onChange={(v) => update("legal", "fullName", v)} placeholder="Иванов Иван Иванович" />
+            <Field label="ИНН" value={settings.legal.inn} onChange={(v) => update("legal", "inn", v)} placeholder="123456789012" />
+            <Field label="ОГРН / ОГРНИП" value={settings.legal.ogrn} onChange={(v) => update("legal", "ogrn", v)} placeholder="123456789012345" />
+            <Field label="Телефон" value={settings.legal.phone} onChange={(v) => update("legal", "phone", v)} placeholder="+7 900 123-45-67" />
+            <Field label="Email" value={settings.legal.email} onChange={(v) => update("legal", "email", v)} type="email" />
+          </div>
+          <Field label="Юридический адрес" value={settings.legal.legalAddress} onChange={(v) => update("legal", "legalAddress", v)} placeholder="г. Москва, ул. Примерная, д. 1" />
+          <Field label="Фактический адрес" value={settings.legal.actualAddress} onChange={(v) => update("legal", "actualAddress", v)} placeholder="г. Москва, ул. Примерная, д. 1" />
+          <div className="grid gap-4 sm:grid-cols-2">
+            <Field label="Банк" value={settings.legal.bankName} onChange={(v) => update("legal", "bankName", v)} placeholder="ПАО Сбербанк" />
+            <Field label="БИК" value={settings.legal.bik} onChange={(v) => update("legal", "bik", v)} placeholder="044525225" />
+            <Field label="Корр. счёт" value={settings.legal.corrAccount} onChange={(v) => update("legal", "corrAccount", v)} placeholder="30101810400000000225" />
+            <Field label="Расчётный счёт" value={settings.legal.bankAccount} onChange={(v) => update("legal", "bankAccount", v)} placeholder="40802810100000000001" />
           </div>
         </Section>
       </div>
