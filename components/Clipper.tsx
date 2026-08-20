@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { formatDuration } from "@/lib/format";
+import { ScheduleModal } from "@/components/ScheduleModal";
 
 interface Video { id: string; title: string; durationSec: number; width: number; height: number; storageKey: string; }
 interface Clip { id: string; startSec: number; endSec: number; status: string; progress: number; storageKey?: string | null; watermarked: boolean; }
@@ -27,6 +28,7 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   const [previewClip, setPreviewClip] = useState<Clip | null>(null);
   const [publishing, setPublishing] = useState<string | null>(null);
   const [published, setPublished] = useState<Record<string, { video?: string; clip?: string }>>({});
+  const [scheduleClip, setScheduleClip] = useState<string | null>(null);
   const rafRef = useRef<number>(0);
 
   const dur = video.durationSec;
@@ -322,6 +324,13 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
                           {publishing === `${clip.id}-clip` ? "..." : "Клип"}
                         </button>
                       )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setScheduleClip(clip.id); }}
+                        className="flex items-center justify-center gap-1 rounded-lg bg-white/5 py-1 text-[10px] text-zinc-500 transition hover:bg-white/10 hover:text-zinc-300"
+                      >
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        Отложить
+                      </button>
                     </div>
                   )}
                 </div>
@@ -359,6 +368,8 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
           </div>
         </div>
       )}
+
+      <ScheduleModal clipId={scheduleClip || ""} open={!!scheduleClip} onClose={() => setScheduleClip(null)} onScheduled={() => {}} />
     </div>
   );
 }

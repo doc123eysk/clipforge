@@ -48,6 +48,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             </Link>
             <div className="hidden md:flex items-center gap-1 text-sm">
               <Link href="/" className="rounded-lg px-4 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-white">Мои видео</Link>
+              <Link href="/schedule" className="rounded-lg px-4 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-white">Расписание</Link>
               <Link href="/pricing" className="rounded-lg px-4 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-white">Тарифы</Link>
               <Link href="/settings" className="rounded-lg px-4 py-2 text-zinc-400 transition hover:bg-white/5 hover:text-white">Настройки</Link>
               <div className="ml-2">

@@ -25,6 +25,7 @@ export function MobileMenu({ email, kind }: Props) {
         <div className="absolute inset-x-0 top-full z-50 glass border-b border-white/5 animate-slide-up" style={{ animationDuration: "0.2s" }}>
           <div className="flex flex-col gap-1 px-4 py-4 text-sm">
             <Link href="/" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Мои видео</Link>
+            <Link href="/schedule" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Расписание</Link>
             <Link href="/pricing" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Тарифы</Link>
             <Link href="/settings" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Настройки</Link>
             <div className="mt-2 border-t border-white/5 pt-3">

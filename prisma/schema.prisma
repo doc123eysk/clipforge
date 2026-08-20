@@ -17,6 +17,7 @@ model User {
   subscription      Subscription?
   videos            Video[]
   socialConnections SocialConnection[]
+  publications      Publication[]
 }
 
 model Subscription {
@@ -84,11 +85,14 @@ model Publication {
   id          String    @id @default(uuid())
   clipId      String
   clip        Clip      @relation(fields: [clipId], references: [id])
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
   provider    String
   status      String    @default("pending")
   progress    Float     @default(0)
   remoteUrl   String?
   error       String?
+  retryCount  Int       @default(0)
   scheduledAt DateTime?
   publishedAt DateTime?
   createdAt   DateTime  @default(now())
