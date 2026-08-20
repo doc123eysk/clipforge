@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
-import { createReadStream } from "fs";
+import { readFile } from "fs/promises";
 import { join } from "path";
 import { stat } from "fs/promises";
 
@@ -21,20 +21,21 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     const range = _req.headers.get("range");
 
     if (range) {
-      const [start, end] = range.replace(/bytes=/, "").split("-").map(Number);
+      const parts = range.replace(/bytes=/, "").split("-");
+      const start = parseInt(parts[0], 10);
+      const end = parts[1] ? parseInt(parts[1], 10) : Math.min(start + 1024 * 1024 - 1, fileStat.size - 1);
       const chunkSize = end - start + 1;
-      const stream = createReadStream(filePath, { start, end });
 
-      const reader = stream as any;
-      const webStream = new ReadableStream({
-        start(controller) {
-          reader.on("data", (chunk: Buffer) => controller.enqueue(new Uint8Array(chunk)));
-          reader.on("end", () => controller.close());
-          reader.on("error", (err: Error) => controller.error(err));
-        },
-      });
+      const buffer = Buffer.alloc(chunkSize);
+      const { open } = await import("fs/promises");
+      const fd = await open(filePath, "r");
+      try {
+        await fd.read(buffer, 0, chunkSize, start);
+      } finally {
+        await fd.close();
+      }
 
-      return new Response(webStream, {
+      return new Response(buffer, {
         status: 206,
         headers: {
           "Content-Range": `bytes ${start}-${end}/${fileStat.size}`,
@@ -45,17 +46,9 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
       });
     }
 
-    const webStream = new ReadableStream({
-      start(controller) {
-        const stream = createReadStream(filePath);
-        const reader = stream as any;
-        reader.on("data", (chunk: Buffer) => controller.enqueue(new Uint8Array(chunk)));
-        reader.on("end", () => controller.close());
-        reader.on("error", (err: Error) => controller.error(err));
-      },
-    });
+    const buffer = await readFile(filePath);
 
-    return new Response(webStream, {
+    return new Response(buffer, {
       headers: {
         "Content-Length": String(fileStat.size),
         "Content-Type": "video/mp4",

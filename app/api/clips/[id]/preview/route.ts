@@ -1,7 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { join } from "path";
-import { stat } from "fs/promises";
-import { createReadStream } from "fs";
+import { readFile } from "fs/promises";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -12,19 +11,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
   const filePath = join(process.cwd(), "storage", "clips", clip.storageKey);
   try {
-    const fileStat = await stat(filePath);
-    const webStream = new ReadableStream({
-      start(controller) {
-        const stream = createReadStream(filePath);
-        const reader = stream as any;
-        reader.on("data", (chunk: Buffer) => controller.enqueue(new Uint8Array(chunk)));
-        reader.on("end", () => controller.close());
-        reader.on("error", (err: Error) => controller.error(err));
-      },
-    });
-    return new Response(webStream, {
+    const buffer = await readFile(filePath);
+    return new Response(buffer, {
       headers: {
-        "Content-Length": String(fileStat.size),
+        "Content-Length": String(buffer.length),
         "Content-Type": "video/mp4",
       },
     });
