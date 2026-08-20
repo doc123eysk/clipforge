@@ -1,5 +1,6 @@
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { VkConnectButton } from "@/components/VkConnectButton";
 
 export const dynamic = "force-dynamic";
 
@@ -46,7 +47,9 @@ export default async function SettingsPage() {
                   <svg width="20" height="20" viewBox="0 0 24 24" fill={p.color}><path d={p.icon} /></svg>
                   <span className="text-sm text-zinc-200">{p.name}</span>
                 </div>
-                {conn ? (
+                {p.id === "vk" ? (
+                  <VkConnectButton connected={!!conn} username={conn?.username ?? conn?.remoteId ?? undefined} />
+                ) : conn ? (
                   <div className="flex items-center gap-2">
                     <span className="text-xs text-zinc-400">{conn.username || conn.remoteId}</span>
                     <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] font-medium text-green-400">Подключено</span>
