@@ -1,13 +1,19 @@
 import nodemailer from "nodemailer";
 import { getSettings } from "./settings";
 
-export async function sendMail({ to, subject, html }: { to: string; subject: string; html: string }) {
-  const settings = await getSettings();
-  const { smtp } = settings;
-
+export async function sendMail({
+  to,
+  subject,
+  html,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+}) {
+  const { smtp } = await getSettings();
   if (!smtp.enabled || !smtp.host || !smtp.user) {
     console.log(`[MAIL] SMTP disabled`);
-    return { ok: false, reason: "smtp_disabled" };
+    return { ok: false };
   }
 
   const transporter = nodemailer.createTransport({
@@ -19,13 +25,12 @@ export async function sendMail({ to, subject, html }: { to: string; subject: str
     connectionTimeout: 15000,
   });
 
-  const info = await transporter.sendMail({
+  await transporter.sendMail({
     from: smtp.from || smtp.user,
     to,
     subject,
     html,
   });
 
-  console.log(`[MAIL] Sent to ${to}, messageId: ${info.messageId}`);
   return { ok: true };
 }

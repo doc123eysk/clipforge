@@ -1,33 +1,29 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
 import { requireAdmin } from "@/lib/auth";
+import { prisma } from "@/lib/prisma";
 
 export async function GET(req: Request) {
   try {
     await requireAdmin();
   } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const { searchParams } = new URL(req.url);
-  const page = parseInt(searchParams.get("page") || "1");
-  const pageSize = 20;
-  const search = searchParams.get("search") || "";
+  const url = new URL(req.url);
+  const page = Math.max(1, Number(url.searchParams.get("page")) || 1);
+  const search = url.searchParams.get("search") || "";
+  const take = 20;
+  const skip = (page - 1) * take;
 
-  const where = search
-    ? { email: { contains: search } }
-    : {};
+  const where = search ? { email: { contains: search } } : {};
 
   const [users, total] = await Promise.all([
     prisma.user.findMany({
       where,
       orderBy: { createdAt: "desc" },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      include: {
-        subscription: true,
-        _count: { select: { videos: true } },
-      },
+      skip,
+      take,
+      include: { subscription: true, _count: { select: { videos: true } } },
     }),
     prisma.user.count({ where }),
   ]);
@@ -37,12 +33,11 @@ export async function GET(req: Request) {
       id: u.id,
       email: u.email,
       kind: u.kind,
+      plan: u.subscription?.plan || "free",
       createdAt: u.createdAt,
       videoCount: u._count.videos,
-      plan: u.subscription?.plan || "free",
     })),
     total,
-    page,
-    totalPages: Math.ceil(total / pageSize),
+    pages: Math.ceil(total / take),
   });
 }

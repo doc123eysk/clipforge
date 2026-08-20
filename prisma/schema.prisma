@@ -11,36 +11,36 @@ model User {
   id        String   @id @default(uuid())
   email     String   @unique
   name      String?
-  kind      String   @default("guest") // guest | registered | admin
+  kind      String   @default("guest")
   createdAt DateTime @default(now())
 
-  subscription Subscription?
-  videos       Video[]
+  subscription      Subscription?
+  videos            Video[]
   socialConnections SocialConnection[]
 }
 
 model Subscription {
-  id        String   @id @default(uuid())
-  userId    String   @unique
-  user      User     @relation(fields: [userId], references: [id])
-  plan      String   @default("free") // free | pro
-  months    Int      @default(1)
+  id        String    @id @default(uuid())
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  plan      String    @default("free")
+  months    Int       @default(1)
   expiresAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 }
 
 model Video {
-  id         String    @id @default(uuid())
-  userId     String
-  user       User      @relation(fields: [userId], references: [id])
-  title      String
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
   durationSec Float
-  width      Int
-  height     Int
-  storageKey String
-  hash       String?
-  expiresAt  DateTime?
-  createdAt  DateTime  @default(now())
+  width       Int
+  height      Int
+  storageKey  String
+  hash        String?
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
 
   clips Clip[]
 
@@ -48,50 +48,50 @@ model Video {
 }
 
 model Clip {
-  id          String    @id @default(uuid())
+  id          String   @id @default(uuid())
   videoId     String
-  video       Video     @relation(fields: [videoId], references: [id])
+  video       Video    @relation(fields: [videoId], references: [id])
   startSec    Float
   endSec      Float
-  status      String    @default("pending") // pending | processing | ready | error
-  progress    Float     @default(0)
+  status      String   @default("pending")
+  progress    Float    @default(0)
   error       String?
   storageKey  String?
   sizeBytes   Int?
-  watermarked Boolean   @default(false)
-  createdAt   DateTime  @default(now())
+  watermarked Boolean  @default(false)
+  createdAt   DateTime @default(now())
 
   publications Publication[]
 }
 
 model SocialConnection {
-  id        String   @id @default(uuid())
+  id        String    @id @default(uuid())
   userId    String
-  user      User     @relation(fields: [userId], references: [id])
-  provider  String   // youtube | vk | tiktok | instagram
-  status    String   @default("active") // active | expired | error
+  user      User      @relation(fields: [userId], references: [id])
+  provider  String
+  status    String    @default("active")
   remoteId  String?
   username  String?
   token     String?
   refresh   String?
   expiresAt DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime  @default(now())
 
   @@unique([userId, provider])
 }
 
 model Publication {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   clipId      String
-  clip        Clip     @relation(fields: [clipId], references: [id])
-  provider    String   // youtube | vk | tiktok | instagram
-  status      String   @default("pending") // pending | publishing | published | scheduled | error
-  progress    Float    @default(0)
+  clip        Clip      @relation(fields: [clipId], references: [id])
+  provider    String
+  status      String    @default("pending")
+  progress    Float     @default(0)
   remoteUrl   String?
   error       String?
   scheduledAt DateTime?
   publishedAt DateTime?
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
 }
 
 model AuthCode {

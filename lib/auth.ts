@@ -26,24 +26,16 @@ export function verifyToken(token: string): { userId: string } | null {
 export async function getCurrentUser(): Promise<AuthUser> {
   const store = await cookies();
   const token = store.get("token")?.value;
-
-  if (!token) {
-    return { id: "", email: null, kind: "guest" };
-  }
+  if (!token) return { id: "", email: null, kind: "guest" };
 
   const payload = verifyToken(token);
-  if (!payload) {
-    return { id: "", email: null, kind: "guest" };
-  }
+  if (!payload) return { id: "", email: null, kind: "guest" };
 
   const user = await prisma.user.findUnique({
     where: { id: payload.userId },
     include: { subscription: true },
   });
-
-  if (!user) {
-    return { id: "", email: null, kind: "guest" };
-  }
+  if (!user) return { id: "", email: null, kind: "guest" };
 
   return {
     id: user.id,
@@ -57,23 +49,17 @@ export async function getCurrentUser(): Promise<AuthUser> {
 
 export async function requireAdmin(): Promise<AuthUser> {
   const user = await getCurrentUser();
-  if (user.kind !== "admin") {
-    throw new Error("Unauthorized");
-  }
+  if (user.kind !== "admin") throw new Error("Unauthorized");
   return user;
 }
 
 export async function getOrCreateGuest(anonId?: string): Promise<AuthUser> {
   if (anonId) {
-    let user = await prisma.user.findUnique({ where: { id: anonId } });
-    if (user) {
-      return { id: user.id, email: null, kind: "guest" };
-    }
+    const user = await prisma.user.findUnique({ where: { id: anonId } });
+    if (user) return { id: user.id, email: null, kind: "guest" };
   }
-
   const user = await prisma.user.create({
     data: { email: `guest-${Date.now()}@anon.local`, kind: "guest" },
   });
-
   return { id: user.id, email: null, kind: "guest" };
 }

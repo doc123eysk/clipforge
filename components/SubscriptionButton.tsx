@@ -1,71 +1,57 @@
 "use client";
 
 import { useState } from "react";
-import { PRO_PRICING, type ProTier } from "@/lib/pricing";
 import toast from "react-hot-toast";
 
-export function SubscriptionButton({ currentPlan }: { currentPlan?: string }) {
-  const [selectedTier, setSelectedTier] = useState<ProTier>("monthly");
+interface Props { currentPlan?: string }
+
+const TIERS = [
+  { key: "monthly", months: 1, label: "1 мес", discount: 0 },
+  { key: "quarterly", months: 3, label: "3 мес", discount: 10 },
+  { key: "halfyear", months: 6, label: "6 мес", discount: 15 },
+  { key: "yearly", months: 12, label: "12 мес", discount: 30 },
+];
+
+export function SubscriptionButton({ currentPlan }: Props) {
+  const [selected, setSelected] = useState("monthly");
   const [loading, setLoading] = useState(false);
 
   if (currentPlan === "pro") {
     return (
-      <div className="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500/10 to-purple-500/10 border border-indigo-500/20 py-3 text-sm font-medium text-indigo-300">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-        </svg>
+      <div className="rounded-xl bg-green-500/10 border border-green-500/20 py-3 text-center text-sm font-medium text-green-400">
         PRO активен
       </div>
     );
   }
 
-  async function handleSubscribe() {
+  async function subscribe() {
     setLoading(true);
     try {
+      const tier = TIERS.find((t) => t.key === selected)!;
       const res = await fetch("/api/subscribe", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ months: PRO_PRICING[selectedTier].months }),
+        body: JSON.stringify({ months: tier.months }),
       });
       if (!res.ok) throw new Error();
-      toast.success("Подписка PRO активирована!");
+      toast.success("PRO активирован!");
       window.location.reload();
-    } catch {
-      toast.error("Ошибка активации");
-    } finally {
-      setLoading(false);
-    }
+    } catch { toast.error("Ошибка"); }
+    finally { setLoading(false); }
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="grid grid-cols-2 gap-2">
-        {(Object.entries(PRO_PRICING) as [ProTier, (typeof PRO_PRICING)[ProTier]][]).map(([key, tier]) => (
-          <button
-            key={key}
-            onClick={() => setSelectedTier(key)}
-            className={`relative rounded-xl border p-3 text-left transition-all duration-300 ${
-              selectedTier === key
-                ? "border-indigo-500/50 bg-indigo-500/10 shadow-lg shadow-indigo-500/10"
-                : "border-white/5 bg-white/[0.02] hover:border-white/10 hover:bg-white/[0.04]"
-            }`}
-          >
-            {"saveLabel" in tier && (
-              <span className="absolute -top-2 -right-2 rounded-full bg-green-500 px-2 py-0.5 text-[10px] font-bold text-white shadow-lg shadow-green-500/25">
-                {tier.saveLabel}
-              </span>
-            )}
-            <div className="text-xs text-zinc-500">{tier.label}</div>
-            <div className="mt-1 text-lg font-bold text-zinc-200">{tier.price} ₽</div>
+        {TIERS.map((t) => (
+          <button key={t.key} onClick={() => setSelected(t.key)}
+            className={`rounded-xl px-3 py-2 text-xs font-medium transition ${selected === t.key ? "bg-indigo-500/20 border border-indigo-500/30 text-indigo-300" : "bg-white/5 border border-white/5 text-zinc-500 hover:text-zinc-300"}`}>
+            {t.label}{t.discount > 0 && <span className="ml-1 text-[10px] text-green-400">-{t.discount}%</span>}
           </button>
         ))}
       </div>
-      <button
-        onClick={handleSubscribe}
-        disabled={loading}
-        className="btn-primary w-full rounded-xl py-3.5 font-bold text-white disabled:opacity-50"
-      >
-        <span>{loading ? "Активация..." : `Подключить PRO — ${PRO_PRICING[selectedTier].price} ₽`}</span>
+      <button onClick={subscribe} disabled={loading} className="btn-primary w-full rounded-xl py-3 font-bold text-white disabled:opacity-50">
+        {loading ? "Активация..." : "Подключить PRO"}
       </button>
     </div>
   );

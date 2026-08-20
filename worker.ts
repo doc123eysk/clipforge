@@ -1,82 +1,56 @@
-import { prisma } from "./lib/prisma";
-import { clipVideo } from "./lib/ffmpeg";
+import { prisma } from "@/lib/prisma";
+import { clipVideo } from "@/lib/ffmpeg";
 import { join } from "path";
-import { mkdir } from "fs/promises";
+import { mkdir, stat } from "fs/promises";
 
-const POLL_INTERVAL = 3000;
+const POLL = 3000;
 
 async function processClip(clip: { id: string; videoId: string; startSec: number; endSec: number; watermarked: boolean }) {
   const video = await prisma.video.findUnique({ where: { id: clip.videoId } });
-  if (!video) {
-    await prisma.clip.update({ where: { id: clip.id }, data: { status: "error", error: "Video not found" } });
-    return;
-  }
+  if (!video) return;
 
-  const inputPath = join(process.cwd(), "storage", "uploads", video.storageKey);
+  const input = join(process.cwd(), "storage", "uploads", video.storageKey);
   const outputDir = join(process.cwd(), "storage", "clips");
   await mkdir(outputDir, { recursive: true });
-  const outputPath = join(outputDir, `${clip.id}.mp4`);
+  const output = join(outputDir, `${clip.id}.mp4`);
+
+  await prisma.clip.update({ where: { id: clip.id }, data: { status: "processing", progress: 10 } });
 
   try {
-    await prisma.clip.update({ where: { id: clip.id }, data: { status: "processing", progress: 10 } });
-
-    await clipVideo(inputPath, outputPath, clip.startSec, clip.endSec, clip.watermarked);
-
-    const stat = await import("fs").then((fs) => fs.statSync(outputPath));
-
+    await clipVideo(input, output, clip.startSec, clip.endSec, clip.watermarked);
+    const fileStat = await stat(output);
     await prisma.clip.update({
       where: { id: clip.id },
-      data: {
-        status: "ready",
-        progress: 100,
-        storageKey: `${clip.id}.mp4`,
-        sizeBytes: stat.size,
-      },
+      data: { status: "ready", progress: 100, storageKey: `${clip.id}.mp4`, sizeBytes: fileStat.size },
     });
-
-    console.log(`[WORKER] Clip ${clip.id} ready (${stat.size} bytes)`);
+    console.log(`[WORKER] Clip ${clip.id} ready`);
   } catch (err: any) {
-    await prisma.clip.update({
-      where: { id: clip.id },
-      data: { status: "error", error: err.message || "Processing failed" },
-    });
-    console.error(`[WORKER] Clip ${clip.id} failed:`, err.message);
+    await prisma.clip.update({ where: { id: clip.id }, data: { status: "error", error: err.message } });
+    console.error(`[WORKER] Clip ${clip.id} error:`, err.message);
   }
 }
 
-async function pollPendingClips() {
-  const clips = await prisma.clip.findMany({
-    where: { status: { in: ["pending"] } },
-    take: 3,
-  });
-
-  for (const clip of clips) {
-    await processClip(clip);
-  }
+async function pollClips() {
+  const clips = await prisma.clip.findMany({ where: { status: "pending" }, take: 3 });
+  await Promise.all(clips.map(processClip));
 }
 
-async function pollScheduledPublications() {
+async function pollPublications() {
   const pubs = await prisma.publication.findMany({
     where: { status: "scheduled", scheduledAt: { lte: new Date() } },
     take: 5,
   });
-
-  for (const pub of pubs) {
-    await prisma.publication.update({ where: { id: pub.id }, data: { status: "pending" } });
-    console.log(`[WORKER] Scheduled publication ${pub.id} moved to pending`);
+  for (const p of pubs) {
+    await prisma.publication.update({ where: { id: p.id }, data: { status: "pending" } });
   }
 }
 
 async function main() {
-  console.log("[WORKER] ClipForge worker started");
+  console.log("[WORKER] Started");
   while (true) {
-    try {
-      await pollPendingClips();
-      await pollScheduledPublications();
-    } catch (err: any) {
-      console.error("[WORKER] Error:", err.message);
-    }
-    await new Promise((r) => setTimeout(r, POLL_INTERVAL));
+    try { await pollClips(); } catch {}
+    try { await pollPublications(); } catch {}
+    await new Promise((r) => setTimeout(r, POLL));
   }
 }
 

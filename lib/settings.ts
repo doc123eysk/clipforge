@@ -12,19 +12,6 @@ export interface AppSettings {
     from: string;
     enabled: boolean;
   };
-  s3: {
-    endpoint: string;
-    bucket: string;
-    accessKey: string;
-    secretKey: string;
-    region: string;
-    enabled: boolean;
-  };
-  ykassa: {
-    shopId: string;
-    secretKey: string;
-    enabled: boolean;
-  };
   limits: {
     maxVideoDurationFree: number;
     maxVideoDurationPro: number;
@@ -52,8 +39,6 @@ export interface AppSettings {
 
 const DEFAULTS: AppSettings = {
   smtp: { host: "", port: "465", user: "", password: "", from: "", enabled: false },
-  s3: { endpoint: "https://storage.yandexcloud.net", bucket: "", accessKey: "", secretKey: "", region: "ru-central1", enabled: false },
-  ykassa: { shopId: "", secretKey: "", enabled: false },
   limits: {
     maxVideoDurationFree: 600,
     maxVideoDurationPro: 7200,
@@ -89,8 +74,6 @@ export async function saveSettings(settings: Partial<AppSettings>): Promise<void
   const current = await getSettings();
   const merged = {
     smtp: { ...current.smtp, ...settings.smtp },
-    s3: { ...current.s3, ...settings.s3 },
-    ykassa: { ...current.ykassa, ...settings.ykassa },
     limits: { ...current.limits, ...settings.limits },
     pricing: { ...current.pricing, ...settings.pricing },
     general: { ...current.general, ...settings.general },
