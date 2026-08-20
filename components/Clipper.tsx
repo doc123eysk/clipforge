@@ -14,29 +14,54 @@ interface Props { video: Video; initialClips: Clip[]; maxClips: number }
 export function Clipper({ video, initialClips, maxClips }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timelineRef = useRef<HTMLDivElement>(null);
+  const seekRef = useRef<HTMLDivElement>(null);
   const [segments, setSegments] = useState<Segment[]>([]);
   const [activeSeg, setActiveSeg] = useState<string | null>(null);
   const [clips, setClips] = useState<Clip[]>(initialClips);
   const [creating, setCreating] = useState(false);
   const [dragging, setDragging] = useState<{ segId: string; side: "start" | "end" } | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
+  const [scrubbing, setScrubbing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const rafRef = useRef<number>(0);
 
   const dur = video.durationSec;
 
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    const onTime = () => setCurrentTime(v.currentTime);
-    v.addEventListener("timeupdate", onTime);
-    return () => v.removeEventListener("timeupdate", onTime);
+    let running = true;
+    const tick = () => {
+      if (!running) return;
+      setCurrentTime(v.currentTime);
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    rafRef.current = requestAnimationFrame(tick);
+    return () => { running = false; cancelAnimationFrame(rafRef.current); };
   }, []);
 
-  const seekVideo = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!timelineRef.current || !videoRef.current) return;
-    const rect = timelineRef.current.getBoundingClientRect();
-    const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+  const seekFromPointer = useCallback((clientX: number) => {
+    if (!seekRef.current || !videoRef.current) return;
+    const rect = seekRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
     videoRef.current.currentTime = x * dur;
-  };
+  }, [dur]);
+
+  const onSeekDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setScrubbing(true);
+    seekFromPointer(e.clientX);
+  }, [seekFromPointer]);
+
+  const onSeekMove = useCallback((e: React.PointerEvent) => {
+    if (!scrubbing) return;
+    seekFromPointer(e.clientX);
+  }, [scrubbing, seekFromPointer]);
+
+  const onSeekUp = useCallback(() => {
+    setScrubbing(false);
+  }, []);
 
   const addSegment = () => {
     if (segments.length >= maxClips) return;
@@ -89,7 +114,10 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   }, [dragging, segments, dur]);
 
   const createClips = async () => {
+    if (!segments.length || creating) return;
     setCreating(true);
+    setError(null);
+    const created: Clip[] = [];
     for (const seg of segments) {
       try {
         const res = await fetch(`/api/videos/${video.id}/clips`, {
@@ -98,9 +126,17 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
           body: JSON.stringify({ startSec: seg.start, endSec: seg.end, watermarked: false }),
         });
         const data = await res.json();
-        if (data.clip) setClips((prev) => [data.clip, ...prev]);
-      } catch {}
+        if (!res.ok) {
+          setError(data.error || `Ошибка ${res.status}`);
+          break;
+        }
+        if (data.clip) created.push(data.clip);
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : "Сетевая ошибка");
+        break;
+      }
     }
+    if (created.length) setClips((prev) => [...created, ...prev]);
     setSegments([]);
     setCreating(false);
   };
@@ -139,13 +175,33 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
           </div>
         </div>
 
-        <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
+        {error && (
+          <div className="mb-3 rounded-xl bg-red-500/10 border border-red-500/20 px-3 py-2 text-xs text-red-400">
+            {error}
+          </div>
+        )}
+
+        <div className="mb-3 flex items-center gap-2 text-xs text-zinc-500">
           <span>{formatDuration(currentTime)}</span>
           <span>/</span>
           <span>{formatDuration(dur)}</span>
         </div>
 
-        <div ref={timelineRef} className="relative h-10 sm:h-12 rounded-xl bg-white/5 touch-none cursor-pointer" onClick={seekVideo}>
+        <div
+          ref={seekRef}
+          className="relative mb-3 h-3 rounded-full bg-white/10 cursor-pointer touch-none select-none"
+          onPointerDown={onSeekDown}
+          onPointerMove={onSeekMove}
+          onPointerUp={onSeekUp}
+        >
+          <div className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 pointer-events-none" style={{ width: `${playheadPct}%` }} />
+          <div
+            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 h-4 w-4 rounded-full bg-white shadow-lg shadow-white/30 pointer-events-none"
+            style={{ left: `${playheadPct}%` }}
+          />
+        </div>
+
+        <div ref={timelineRef} className="relative h-10 sm:h-12 rounded-xl bg-white/5 touch-none">
           {segments.map((seg) => (
             <div key={seg.id} className={`absolute top-0 h-full cursor-pointer rounded-lg transition ${activeSeg === seg.id ? "ring-2 ring-white/40" : ""}`}
               style={{ left: `${(seg.start / dur) * 100}%`, width: `${((seg.end - seg.start) / dur) * 100}%`, backgroundColor: seg.color + "33", borderLeft: `3px solid ${seg.color}`, borderRight: `3px solid ${seg.color}` }}
@@ -156,9 +212,7 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
             </div>
           ))}
 
-          <div className="absolute top-0 h-full w-0.5 bg-white pointer-events-none z-10" style={{ left: `${playheadPct}%` }}>
-            <div className="absolute -top-1 left-1/2 -translate-x-1/2 h-2.5 w-2.5 rounded-full bg-white shadow-lg shadow-white/30" />
-          </div>
+          <div className="absolute top-0 h-full w-0.5 bg-white/60 pointer-events-none z-10" style={{ left: `${playheadPct}%` }} />
         </div>
 
         {segments.length > 0 && (
