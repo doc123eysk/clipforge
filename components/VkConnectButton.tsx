@@ -90,8 +90,8 @@ export function VkConnectButton({ connected, username }: { connected: boolean; u
   if (connected) {
     return (
       <div className="flex items-center gap-2">
-        <span className="text-xs text-zinc-500">{username || "VK"}</span>
-        <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">Подключено</span>
+        <span className="text-xs text-zinc-400">{username || "VK"}</span>
+        <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] font-medium text-green-400">Подключено</span>
       </div>
     );
   }
@@ -101,7 +101,7 @@ export function VkConnectButton({ connected, username }: { connected: boolean; u
       <button
         onClick={handleConnect}
         disabled={loading}
-        className="rounded-lg bg-black/[0.03] border border-black/10 px-3 py-1.5 text-xs text-zinc-500 transition hover:bg-black/[0.06] hover:text-zinc-800 disabled:opacity-50"
+        className="rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-400 transition hover:bg-white/10 hover:text-white disabled:opacity-50"
       >
         {loading ? "Загрузка..." : "Подключить"}
       </button>

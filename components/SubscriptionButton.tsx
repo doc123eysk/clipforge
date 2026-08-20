@@ -20,10 +20,10 @@ export function SubscriptionButton({ currentPlan, expiresAt }: Props) {
     const exp = expiresAt ? new Date(expiresAt).toLocaleDateString("ru-RU") : "бессрочно";
     return (
       <div className="space-y-2">
-        <div className="rounded-xl bg-green-50 border border-green-200 py-3 text-center text-sm font-medium text-green-700">
+        <div className="rounded-xl bg-green-500/10 border border-green-500/20 py-3 text-center text-sm font-medium text-green-400">
           PRO активен
         </div>
-        <p className="text-center text-xs text-zinc-400">Действует до {exp}</p>
+        <p className="text-center text-xs text-zinc-500">Действует до {exp}</p>
       </div>
     );
   }
@@ -53,8 +53,8 @@ export function SubscriptionButton({ currentPlan, expiresAt }: Props) {
       <div className="grid grid-cols-2 gap-2">
         {TIERS.map((t) => (
           <button key={t.key} onClick={() => setSelected(t.key)}
-            className={`rounded-xl px-3 py-2 text-xs font-medium transition ${selected === t.key ? "bg-indigo-50 border border-indigo-200 text-indigo-700" : "bg-black/5 border border-black/5 text-zinc-500 hover:text-zinc-700"}`}>
-            {t.label}{t.discount > 0 && <span className="ml-1 text-[10px] text-green-600">-{t.discount}%</span>}
+            className={`rounded-xl px-3 py-2 text-xs font-medium transition ${selected === t.key ? "bg-indigo-500/20 border border-indigo-500/30 text-indigo-300" : "bg-white/5 border border-white/5 text-zinc-500 hover:text-zinc-300"}`}>
+            {t.label}{t.discount > 0 && <span className="ml-1 text-[10px] text-green-400">-{t.discount}%</span>}
           </button>
         ))}
       </div>

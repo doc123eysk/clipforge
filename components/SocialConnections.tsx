@@ -35,23 +35,23 @@ export function SocialConnections({ connections }: { connections: Connection[] }
       {PROVIDERS.map((p) => {
         const conn = conns.find((c) => c.provider === p.id);
         return (
-          <div key={p.id} className="flex items-center justify-between rounded-xl bg-black/[0.02] border border-black/5 px-3 sm:px-4 py-3">
+          <div key={p.id} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 px-3 sm:px-4 py-3">
             <div className="flex items-center gap-3">
               <svg width="20" height="20" viewBox="0 0 24 24" fill={p.color}><path d={p.icon} /></svg>
-              <span className="text-sm text-zinc-800">{p.name}</span>
+              <span className="text-sm text-zinc-200">{p.name}</span>
             </div>
             {conn ? (
               <div className="flex items-center gap-2">
-                <span className="text-xs text-zinc-500">{conn.username || conn.remoteId}</span>
-                <span className="rounded-full bg-green-100 px-2 py-0.5 text-[10px] font-medium text-green-700">Подключено</span>
+                <span className="text-xs text-zinc-400">{conn.username || conn.remoteId}</span>
+                <span className="rounded-full bg-green-500/20 px-2 py-0.5 text-[10px] font-medium text-green-400">Подключено</span>
                 {p.id !== "vk" && (
-                  <button onClick={() => disconnect(p.id)} className="rounded-lg bg-red-50 px-2 py-0.5 text-[10px] text-red-600 hover:bg-red-100 transition">
+                  <button onClick={() => disconnect(p.id)} className="rounded-lg bg-red-500/10 px-2 py-0.5 text-[10px] text-red-400 hover:bg-red-500/20 transition">
                     Отключить
                   </button>
                 )}
               </div>
             ) : (
-              <a href={`/api/social/connect?provider=${p.id}`} className="rounded-lg bg-black/5 border border-black/10 px-3 py-1.5 text-xs text-zinc-500 transition hover:bg-black/10 hover:text-zinc-900">
+              <a href={`/api/social/connect?provider=${p.id}`} className="rounded-lg bg-white/5 border border-white/10 px-3 py-1.5 text-xs text-zinc-400 transition hover:bg-white/10 hover:text-white">
                 Подключить
               </a>
             )}

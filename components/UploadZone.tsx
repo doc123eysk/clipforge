@@ -42,23 +42,23 @@ export function UploadZone({ userKind }: Props) {
       onDragLeave={() => setDrag(false)}
       onDrop={(e) => { e.preventDefault(); setDrag(false); if (e.dataTransfer.files[0]) upload(e.dataTransfer.files[0]); }}
       onClick={() => input.current?.click()}
-      className={`glass card-glow cursor-pointer rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition ${drag ? "border-indigo-500 bg-indigo-50/50" : "border-black/10 hover:border-indigo-300"}`}
+      className={`glass card-glow cursor-pointer rounded-2xl border-2 border-dashed p-8 sm:p-12 text-center transition ${drag ? "border-indigo-500 bg-indigo-500/5" : "border-white/10 hover:border-white/20"}`}
     >
       <input ref={input} type="file" accept="video/*" className="hidden" onChange={(e) => { if (e.target.files?.[0]) upload(e.target.files[0]); }} />
       {uploading ? (
         <div>
-          <div className="mx-auto mb-4 h-2 w-48 sm:w-64 overflow-hidden rounded-full bg-black/5">
+          <div className="mx-auto mb-4 h-2 w-48 sm:w-64 overflow-hidden rounded-full bg-white/5">
             <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-300" style={{ width: `${progress}%` }} />
           </div>
-          <p className="text-sm text-zinc-500">{progress}%</p>
+          <p className="text-sm text-zinc-400">{progress}%</p>
         </div>
       ) : (
         <>
-          <svg className="mx-auto mb-4" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg className="mx-auto mb-4" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
             <polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
           </svg>
-          <p className="mb-2 text-base sm:text-lg font-medium text-zinc-800">Перетащите видео сюда</p>
-          <p className="text-xs sm:text-sm text-zinc-400">или нажмите для выбора файла</p>
+          <p className="mb-2 text-base sm:text-lg font-medium text-zinc-200">Перетащите видео сюда</p>
+          <p className="text-xs sm:text-sm text-zinc-500">или нажмите для выбора файла</p>
         </>
       )}
     </div>

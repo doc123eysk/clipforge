@@ -50,16 +50,16 @@ export function ScheduleModal({ clipId, open, onClose, onScheduled }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" onClick={onClose}>
       <div className="glass card-glow rounded-2xl p-6 w-full max-w-sm" onClick={(e) => e.stopPropagation()}>
-        <h3 className="mb-4 text-lg font-semibold text-zinc-800">Отложить публикацию</h3>
+        <h3 className="mb-4 text-lg font-semibold text-zinc-200">Отложить публикацию</h3>
 
         <label className="mb-1 block text-xs text-zinc-500">Дата и время</label>
         <input
           type="datetime-local"
           value={date}
           onChange={(e) => setDate(e.target.value)}
-          className="mb-4 w-full rounded-lg border border-black/10 bg-white px-3 py-2 text-sm text-zinc-900 outline-none focus:border-indigo-500"
+          className="mb-4 w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-zinc-200 outline-none focus:border-indigo-500"
         />
 
         <label className="mb-2 block text-xs text-zinc-500">Платформа</label>
@@ -71,7 +71,7 @@ export function ScheduleModal({ clipId, open, onClose, onScheduled }: Props) {
               className={`rounded-lg px-3 py-1.5 text-xs font-medium transition ${
                 provider === p.id
                   ? "text-white"
-                  : "bg-black/5 text-zinc-500 hover:bg-black/10"
+                  : "bg-white/5 text-zinc-400 hover:bg-white/10"
               }`}
               style={provider === p.id ? { backgroundColor: p.color + "40", color: p.color } : {}}
             >
@@ -81,7 +81,7 @@ export function ScheduleModal({ clipId, open, onClose, onScheduled }: Props) {
         </div>
 
         <div className="flex gap-2">
-          <button onClick={onClose} className="flex-1 rounded-lg bg-black/5 py-2 text-sm text-zinc-500 transition hover:bg-black/10">
+          <button onClick={onClose} className="flex-1 rounded-lg bg-white/5 py-2 text-sm text-zinc-400 transition hover:bg-white/10">
             Отмена
           </button>
           <button

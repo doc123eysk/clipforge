@@ -36,18 +36,18 @@ export default async function HomePage() {
 
       {videos.length > 0 && (
         <div>
-          <h2 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-zinc-800">Ваши видео</h2>
+          <h2 className="mb-4 sm:mb-6 text-lg sm:text-xl font-semibold text-zinc-200">Ваши видео</h2>
           <div className="grid gap-3 sm:gap-4 sm:grid-cols-2">
             {videos.map((v) => (
-              <a key={v.id} href={`/videos/${v.id}`} className="glass card-glow flex items-center gap-3 sm:gap-4 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition hover:bg-black/[0.03]">
-                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2"><polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" /></svg>
+              <a key={v.id} href={`/videos/${v.id}`} className="glass card-glow flex items-center gap-3 sm:gap-4 rounded-xl sm:rounded-2xl p-3 sm:p-4 transition hover:bg-white/[0.04]">
+                <div className="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2"><polygon points="23 7 16 12 23 17 23 7" /><rect x="1" y="5" width="15" height="14" rx="2" ry="2" /></svg>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-medium text-zinc-800 text-sm sm:text-base">{v.title}</p>
-                  <p className="text-xs text-zinc-400">{formatDuration(v.durationSec)} · {v._count.clips} клипов</p>
+                  <p className="truncate font-medium text-zinc-200 text-sm sm:text-base">{v.title}</p>
+                  <p className="text-xs text-zinc-500">{formatDuration(v.durationSec)} · {v._count.clips} клипов</p>
                 </div>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a1a1aa" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#52525b" strokeWidth="2"><polyline points="9 18 15 12 9 6" /></svg>
               </a>
             ))}
           </div>
