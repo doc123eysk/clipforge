@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
-import { getCurrentUser, signToken } from "@/lib/auth";
+import { getCurrentUser } from "@/lib/auth";
+import { getSettings } from "@/lib/settings";
+import { createPayment } from "@/lib/yookassa";
 
 export async function POST(req: Request) {
   const user = await getCurrentUser();
@@ -9,14 +10,41 @@ export async function POST(req: Request) {
   const body = await req.json();
   const { months = 1 } = body;
 
-  const expiresAt = new Date();
-  expiresAt.setMonth(expiresAt.getMonth() + months);
+  const settings = await getSettings();
+  const { yandexKassa, pricing } = settings;
 
-  await prisma.subscription.upsert({
-    where: { userId: user.id },
-    update: { plan: "pro", months, expiresAt },
-    create: { userId: user.id, plan: "pro", months, expiresAt },
-  });
+  if (!yandexKassa.enabled || !yandexKassa.shopId || !yandexKassa.secretKey) {
+    return NextResponse.json({ error: "Payment not configured" }, { status: 500 });
+  }
 
-  return NextResponse.json({ ok: true, expiresAt });
+  let price = pricing.monthlyPrice;
+  if (months === 3) price = Math.round(price * 3 * (1 - pricing.quarterlyDiscount / 100));
+  else if (months === 6) price = Math.round(price * 6 * (1 - pricing.halfyearDiscount / 100));
+  else if (months === 12) price = Math.round(price * 12 * (1 - pricing.yearlyDiscount / 100));
+  else price = price * months;
+
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://clip-forge.ru";
+
+  try {
+    const payment = await createPayment({
+      amount: price,
+      description: `ClipForge PRO — ${months} мес.`,
+      userId: user.id,
+      months,
+      returnUrl: `${origin}/pricing?paid=1`,
+    });
+
+    if (!payment.confirmation?.confirmation_url) {
+      return NextResponse.json({ error: "No confirmation URL" }, { status: 500 });
+    }
+
+    return NextResponse.json({
+      ok: true,
+      paymentId: payment.id,
+      confirmationUrl: payment.confirmation.confirmation_url,
+    });
+  } catch (err: any) {
+    console.error("[Subscribe] Error:", err.message);
+    return NextResponse.json({ error: "Payment creation failed" }, { status: 500 });
+  }
 }

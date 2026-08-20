@@ -59,7 +59,7 @@ export default async function PricingPage() {
               </li>
             ))}
           </ul>
-          <SubscriptionButton currentPlan={user.subscription?.plan} />
+          <SubscriptionButton currentPlan={user.subscription?.plan} expiresAt={user.subscription?.expiresAt?.toISOString() ?? null} />
         </div>
       </div>
     </div>

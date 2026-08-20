@@ -37,12 +37,21 @@ export async function getCurrentUser(): Promise<AuthUser> {
   });
   if (!user) return { id: "", email: null, kind: "guest" };
 
+  let sub = user.subscription;
+  if (sub && sub.plan === "pro" && sub.expiresAt && new Date(sub.expiresAt) < new Date()) {
+    await prisma.subscription.update({
+      where: { userId: user.id },
+      data: { plan: "free" },
+    });
+    sub = { ...sub, plan: "free" };
+  }
+
   return {
     id: user.id,
     email: user.email,
     kind: user.kind,
-    subscription: user.subscription
-      ? { plan: user.subscription.plan, expiresAt: user.subscription.expiresAt }
+    subscription: sub
+      ? { plan: sub.plan, expiresAt: sub.expiresAt }
       : null,
   };
 }

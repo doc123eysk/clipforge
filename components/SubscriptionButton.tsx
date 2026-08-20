@@ -3,7 +3,7 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 
-interface Props { currentPlan?: string }
+interface Props { currentPlan?: string; expiresAt?: string | null }
 
 const TIERS = [
   { key: "monthly", months: 1, label: "1 мес", discount: 0 },
@@ -12,14 +12,18 @@ const TIERS = [
   { key: "yearly", months: 12, label: "12 мес", discount: 30 },
 ];
 
-export function SubscriptionButton({ currentPlan }: Props) {
+export function SubscriptionButton({ currentPlan, expiresAt }: Props) {
   const [selected, setSelected] = useState("monthly");
   const [loading, setLoading] = useState(false);
 
   if (currentPlan === "pro") {
+    const exp = expiresAt ? new Date(expiresAt).toLocaleDateString("ru-RU") : "бессрочно";
     return (
-      <div className="rounded-xl bg-green-500/10 border border-green-500/20 py-3 text-center text-sm font-medium text-green-400">
-        PRO активен
+      <div className="space-y-2">
+        <div className="rounded-xl bg-green-500/10 border border-green-500/20 py-3 text-center text-sm font-medium text-green-400">
+          PRO активен
+        </div>
+        <p className="text-center text-xs text-zinc-500">Действует до {exp}</p>
       </div>
     );
   }
@@ -33,11 +37,15 @@ export function SubscriptionButton({ currentPlan }: Props) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ months: tier.months }),
       });
-      if (!res.ok) throw new Error();
-      toast.success("PRO активирован!");
-      window.location.reload();
-    } catch { toast.error("Ошибка"); }
-    finally { setLoading(false); }
+      const data = await res.json();
+      if (!res.ok || !data.confirmationUrl) {
+        throw new Error(data.error || "Failed");
+      }
+      window.location.href = data.confirmationUrl;
+    } catch (err: any) {
+      toast.error(err.message === "Payment not configured" ? "Оплата не настроена" : "Ошибка");
+      setLoading(false);
+    }
   }
 
   return (
@@ -51,7 +59,7 @@ export function SubscriptionButton({ currentPlan }: Props) {
         ))}
       </div>
       <button onClick={subscribe} disabled={loading} className="btn-primary w-full rounded-xl py-3 font-bold text-white disabled:opacity-50">
-        {loading ? "Активация..." : "Подключить PRO"}
+        {loading ? "Перенаправление..." : "Подключить PRO"}
       </button>
     </div>
   );
