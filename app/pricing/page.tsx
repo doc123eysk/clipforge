@@ -10,17 +10,17 @@ export default async function PricingPage() {
   const p = settings.pricing;
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-20">
-      <div className="mb-16 text-center">
-        <h1 className="animate-slide-up mb-4 text-5xl font-bold"><span className="gradient-text">Выберите план</span></h1>
-        <p className="animate-slide-up delay-100 text-lg text-zinc-500">Начните бесплатно, обновите когда будете готовы</p>
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 py-12 sm:py-20">
+      <div className="mb-10 sm:mb-16 text-center">
+        <h1 className="animate-slide-up mb-3 sm:mb-4 text-3xl sm:text-5xl font-bold"><span className="gradient-text">Выберите план</span></h1>
+        <p className="animate-slide-up delay-100 text-base sm:text-lg text-zinc-500">Начните бесплатно, обновите когда будете готовы</p>
       </div>
-      <div className="grid gap-8 md:grid-cols-2">
-        <div className="glass card-glow rounded-3xl p-8">
+      <div className="grid gap-6 sm:gap-8 sm:grid-cols-2">
+        <div className="glass card-glow rounded-2xl sm:rounded-3xl p-6 sm:p-8">
           <h2 className="mb-2 text-xl font-bold text-zinc-200">Free</h2>
-          <p className="mb-6 text-sm text-zinc-500">Для знакомства с сервисом</p>
-          <div className="mb-8"><span className="text-5xl font-bold text-zinc-300">0 ₽</span><span className="ml-2 text-sm text-zinc-600">навсегда</span></div>
-          <ul className="mb-8 space-y-3">
+          <p className="mb-4 sm:mb-6 text-sm text-zinc-500">Для знакомства с сервисом</p>
+          <div className="mb-6 sm:mb-8"><span className="text-4xl sm:text-5xl font-bold text-zinc-300">0 ₽</span><span className="ml-2 text-sm text-zinc-600">навсегда</span></div>
+          <ul className="mb-6 sm:mb-8 space-y-3">
             {[
               `Видео до ${Math.round(settings.limits.maxVideoDurationFree / 60)} мин`,
               `До ${settings.limits.maxClipsPerVideoFree} клипов`,
@@ -28,7 +28,7 @@ export default async function PricingPage() {
               "Водяной знак",
             ].map((f, i) => (
               <li key={i} className="flex items-center gap-3 text-sm text-zinc-400">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-zinc-800 text-[10px]">✓</span>{f}
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px]">✓</span>{f}
               </li>
             ))}
           </ul>
@@ -36,17 +36,17 @@ export default async function PricingPage() {
             {!user.subscription?.plan || user.subscription.plan === "free" ? "Текущий" : "Переключиться"}
           </div>
         </div>
-        <div className="relative glass neon-border card-glow rounded-3xl p-8">
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-5 py-1.5 text-xs font-bold text-white shadow-lg">ПОПУЛЯРНЫЙ</div>
+        <div className="relative glass neon-border card-glow rounded-2xl sm:rounded-3xl p-6 sm:p-8">
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 sm:px-5 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold text-white shadow-lg">ПОПУЛЯРНЫЙ</div>
           <h2 className="mb-2 text-xl font-bold text-zinc-200">PRO</h2>
-          <p className="mb-6 text-sm text-zinc-500">Для профессионалов</p>
-          <div className="mb-4"><span className="text-5xl font-bold gradient-text">{p.monthlyPrice} ₽</span><span className="ml-2 text-sm text-zinc-600">/мес</span></div>
-          <div className="mb-6 flex flex-wrap gap-2">
+          <p className="mb-4 sm:mb-6 text-sm text-zinc-500">Для профессионалов</p>
+          <div className="mb-3 sm:mb-4"><span className="text-4xl sm:text-5xl font-bold gradient-text">{p.monthlyPrice} ₽</span><span className="ml-2 text-sm text-zinc-600">/мес</span></div>
+          <div className="mb-4 sm:mb-6 flex flex-wrap gap-2">
             {p.quarterlyDiscount > 0 && <span className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 text-xs text-indigo-300">3 мес: −{p.quarterlyDiscount}%</span>}
             {p.halfyearDiscount > 0 && <span className="rounded-full bg-purple-500/10 border border-purple-500/20 px-3 py-1 text-xs text-purple-300">6 мес: −{p.halfyearDiscount}%</span>}
             {p.yearlyDiscount > 0 && <span className="rounded-full bg-pink-500/10 border border-pink-500/20 px-3 py-1 text-xs text-pink-300">12 мес: −{p.yearlyDiscount}%</span>}
           </div>
-          <ul className="mb-8 space-y-3">
+          <ul className="mb-6 sm:mb-8 space-y-3">
             {[
               `Видео до ${Math.round(settings.limits.maxVideoDurationPro / 60)} мин`,
               `До ${settings.limits.maxClipsPerVideoPro} клипов`,
@@ -55,7 +55,7 @@ export default async function PricingPage() {
               "Приоритетная обработка",
             ].map((f, i) => (
               <li key={i} className="flex items-center gap-3 text-sm text-zinc-400">
-                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-indigo-500/20 text-[10px] text-indigo-400">✓</span>{f}
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-[10px] text-indigo-400">✓</span>{f}
               </li>
             ))}
           </ul>

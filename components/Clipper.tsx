@@ -41,18 +41,20 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
     setSegments(segments.map((s) => (s.id === id ? { ...s, ...patch } : s)));
   };
 
-  const onTimelineMouseDown = useCallback((e: React.MouseEvent, segId: string, side: "start" | "end") => {
+  const onTimelineMouseDown = useCallback((e: React.MouseEvent | React.TouchEvent, segId: string, side: "start" | "end") => {
     e.stopPropagation();
+    if (e.cancelable) e.preventDefault();
     setActiveSeg(segId);
     setDragging({ segId, side });
   }, []);
 
   useEffect(() => {
     if (!dragging) return;
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: MouseEvent | TouchEvent) => {
       if (!timelineRef.current) return;
       const rect = timelineRef.current.getBoundingClientRect();
-      const x = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const clientX = "touches" in e ? e.touches[0].clientX : e.clientX;
+      const x = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
       const time = x * dur;
       const seg = segments.find((s) => s.id === dragging.segId);
       if (!seg) return;
@@ -65,7 +67,9 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
     const onUp = () => setDragging(null);
     window.addEventListener("mousemove", onMove);
     window.addEventListener("mouseup", onUp);
-    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+    window.addEventListener("touchmove", onMove, { passive: false });
+    window.addEventListener("touchend", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); window.removeEventListener("touchmove", onMove); window.removeEventListener("touchend", onUp); };
   }, [dragging, segments, dur]);
 
   const createClips = async () => {
@@ -101,30 +105,30 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   }, [clips]);
 
   return (
-    <div className="space-y-6">
-      <video ref={videoRef} src={`/api/videos/${video.id}/stream`} controls className="mx-auto max-h-[50vh] rounded-2xl" />
+    <div className="space-y-4 sm:space-y-6">
+      <video ref={videoRef} src={`/api/videos/${video.id}/stream`} controls className="mx-auto max-h-[40vh] sm:max-h-[50vh] rounded-xl sm:rounded-2xl w-full" />
 
-      <div className="glass card-glow rounded-2xl p-6">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
+        <div className="mb-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
           <h3 className="font-semibold text-zinc-200">Таймлайн</h3>
-          <div className="flex gap-2">
-            <button onClick={addSegment} disabled={segments.length >= maxClips} className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-4 py-2 text-sm font-medium text-indigo-300 transition hover:bg-indigo-500/30 disabled:opacity-50">
+          <div className="flex gap-2 w-full sm:w-auto">
+            <button onClick={addSegment} disabled={segments.length >= maxClips} className="flex-1 sm:flex-none rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-indigo-300 transition hover:bg-indigo-500/30 disabled:opacity-50">
               + Сегмент
             </button>
-            <button onClick={createClips} disabled={!segments.length || creating} className="rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-4 py-2 text-sm font-bold text-white transition hover:shadow-lg disabled:opacity-50">
+            <button onClick={createClips} disabled={!segments.length || creating} className="flex-1 sm:flex-none rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 px-3 sm:px-4 py-2 text-xs sm:text-sm font-bold text-white transition hover:shadow-lg disabled:opacity-50">
               {creating ? "Создание..." : `Создать (${segments.length})`}
             </button>
           </div>
         </div>
 
-        <div ref={timelineRef} className="relative h-12 rounded-xl bg-white/5">
+        <div ref={timelineRef} className="relative h-10 sm:h-12 rounded-xl bg-white/5 touch-none">
           {segments.map((seg) => (
             <div key={seg.id} className={`absolute top-0 h-full cursor-pointer rounded-lg transition ${activeSeg === seg.id ? "ring-2 ring-white/40" : ""}`}
               style={{ left: `${(seg.start / dur) * 100}%`, width: `${((seg.end - seg.start) / dur) * 100}%`, backgroundColor: seg.color + "33", borderLeft: `3px solid ${seg.color}`, borderRight: `3px solid ${seg.color}` }}
               onClick={() => setActiveSeg(seg.id)}>
-              <div className="absolute -top-6 left-0 text-[10px] text-zinc-400">{formatDuration(seg.start)}</div>
-              <div className="absolute h-3 w-1.5 cursor-ew-resize rounded-l bg-white/60 left-0 top-1/2 -translate-y-1/2 -ml-0.5" onMouseDown={(e) => onTimelineMouseDown(e, seg.id, "start")} />
-              <div className="absolute h-3 w-1.5 cursor-ew-resize rounded-r bg-white/60 right-0 top-1/2 -translate-y-1/2 -mr-0.5" onMouseDown={(e) => onTimelineMouseDown(e, seg.id, "end")} />
+              <div className="absolute -top-6 left-0 text-[10px] text-zinc-400 hidden sm:block">{formatDuration(seg.start)}</div>
+              <div className="absolute h-4 w-2 sm:h-3 sm:w-1.5 cursor-ew-resize rounded-l bg-white/60 left-0 top-1/2 -translate-y-1/2 -ml-0.5" onMouseDown={(e) => onTimelineMouseDown(e, seg.id, "start")} onTouchStart={(e) => onTimelineMouseDown(e, seg.id, "start")} />
+              <div className="absolute h-4 w-2 sm:h-3 sm:w-1.5 cursor-ew-resize rounded-r bg-white/60 right-0 top-1/2 -translate-y-1/2 -mr-0.5" onMouseDown={(e) => onTimelineMouseDown(e, seg.id, "end")} onTouchStart={(e) => onTimelineMouseDown(e, seg.id, "end")} />
             </div>
           ))}
         </div>
@@ -133,7 +137,7 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
           <div className="mt-4 flex flex-wrap gap-2">
             {segments.map((seg) => (
               <div key={seg.id} className="flex items-center gap-2 rounded-xl bg-white/5 border border-white/5 px-3 py-1.5 text-xs">
-                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: seg.color }} />
+                <span className="h-2 w-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
                 <span className="text-zinc-400">{formatDuration(seg.start)} – {formatDuration(seg.end)}</span>
                 <button onClick={() => removeSegment(seg.id)} className="ml-1 text-zinc-600 hover:text-red-400">×</button>
               </div>
@@ -143,11 +147,11 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
       </div>
 
       {clips.length > 0 && (
-        <div className="glass card-glow rounded-2xl p-6">
+        <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
           <h3 className="mb-4 font-semibold text-zinc-200">Клипы ({clips.length})</h3>
-          <div className="grid gap-4 md:grid-cols-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
             {clips.map((clip) => (
-              <div key={clip.id} className="glass card-glow rounded-xl overflow-hidden">
+              <div key={clip.id} className="glass card-glow rounded-lg sm:rounded-xl overflow-hidden">
                 {clip.status === "ready" ? (
                   <video src={`/api/clips/${clip.id}/preview`} className="aspect-[9/16] w-full object-cover" muted />
                 ) : (

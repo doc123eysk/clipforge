@@ -22,8 +22,8 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
   const maxClips = isPro ? settings.limits.maxClipsPerVideoPro : settings.limits.maxClipsPerVideoFree;
 
   return (
-    <div className="mx-auto max-w-5xl px-6 py-12">
-      <h1 className="mb-6 text-2xl font-bold text-zinc-200">{video.title}</h1>
+    <div className="mx-auto max-w-5xl px-4 sm:px-6 py-8 sm:py-12">
+      <h1 className="mb-4 sm:mb-6 text-xl sm:text-2xl font-bold text-zinc-200 truncate">{video.title}</h1>
       <Clipper video={video} initialClips={user.kind === "guest" ? [] : video.clips} maxClips={maxClips} />
     </div>
   );

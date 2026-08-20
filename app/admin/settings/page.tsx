@@ -26,7 +26,7 @@ function Field({ label, value, onChange, type = "text", placeholder, secret }: {
     <div>
       <label className="mb-1.5 block text-xs font-medium text-zinc-400">{label}</label>
       <input type={secret && !show ? "password" : type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+        className="w-full rounded-xl border border-white/10 bg-white/5 px-3 sm:px-4 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
       {secret && <button onClick={() => setShow(!show)} className="mt-1 text-xs text-zinc-500 hover:text-zinc-300">{show ? "Скрыть" : "Показать"}</button>}
     </div>
   );
@@ -45,8 +45,8 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="glass card-glow rounded-2xl p-6">
-      <h2 className="mb-5 text-lg font-semibold text-zinc-200">{title}</h2>
+    <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
+      <h2 className="mb-4 sm:mb-5 text-base sm:text-lg font-semibold text-zinc-200">{title}</h2>
       <div className="space-y-4">{children}</div>
     </div>
   );
@@ -76,15 +76,15 @@ export default function AdminSettingsPage() {
   if (loading) return <div className="flex items-center justify-center py-20"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2"><circle cx="12" cy="12" r="10" strokeDasharray="32" strokeDashoffset="32"><animate attributeName="stroke-dashoffset" values="32;0" dur="1s" repeatCount="indefinite" /></circle></svg></div>;
 
   return (
-    <div className="mx-auto max-w-4xl px-6 py-12">
-      <div className="mb-10 flex items-end justify-between">
-        <h1 className="text-4xl font-bold"><span className="gradient-text">Настройки</span></h1>
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-8 sm:py-12">
+      <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+        <h1 className="text-2xl sm:text-4xl font-bold"><span className="gradient-text">Настройки</span></h1>
         <div className="flex gap-2">
-          <Link href="/admin" className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition">Дашборд</Link>
-          <Link href="/admin/settings" className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-4 py-2 text-sm font-medium text-indigo-300">Настройки</Link>
+          <Link href="/admin" className="rounded-xl border border-white/10 bg-white/5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-400 hover:text-white transition">Дашборд</Link>
+          <Link href="/admin/settings" className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-indigo-300">Настройки</Link>
         </div>
       </div>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6">
         <Section title="Общие">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Название" value={settings.general.siteName} onChange={(v) => update("general", "siteName", v)} />
@@ -134,8 +134,8 @@ export default function AdminSettingsPage() {
           )}
         </Section>
       </div>
-      <div className="mt-8 flex justify-end">
-        <button onClick={handleSave} disabled={saving} className="btn-primary rounded-xl px-8 py-3 font-bold text-white disabled:opacity-50">
+      <div className="mt-6 sm:mt-8 flex justify-end">
+        <button onClick={handleSave} disabled={saving} className="btn-primary rounded-xl px-6 sm:px-8 py-3 font-bold text-white disabled:opacity-50">
           {saving ? "Сохранение..." : "Сохранить"}
         </button>
       </div>

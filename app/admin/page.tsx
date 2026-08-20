@@ -30,48 +30,46 @@ export default function AdminPage() {
   ];
 
   return (
-    <div className="mx-auto max-w-7xl px-6 py-12">
-      <div className="mb-10 flex items-end justify-between">
-        <div>
-          <h1 className="text-4xl font-bold"><span className="gradient-text">Админ-панель</span></h1>
-        </div>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8 sm:py-12">
+      <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
+        <h1 className="text-2xl sm:text-4xl font-bold"><span className="gradient-text">Админ-панель</span></h1>
         <div className="flex gap-2">
-          <Link href="/admin" className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-4 py-2 text-sm font-medium text-indigo-300">Дашборд</Link>
-          <Link href="/admin/settings" className="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-medium text-zinc-400 hover:text-white transition">Настройки</Link>
+          <Link href="/admin" className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-indigo-300">Дашборд</Link>
+          <Link href="/admin/settings" className="rounded-xl border border-white/10 bg-white/5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-400 hover:text-white transition">Настройки</Link>
         </div>
       </div>
 
-      <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="mb-8 sm:mb-10 grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
         {cards.map((c) => (
-          <div key={c.label} className="glass card-glow rounded-2xl p-5">
-            <div className="text-3xl font-bold text-zinc-100">{c.value}</div>
-            <div className="mt-1 text-sm text-zinc-500">{c.label}</div>
+          <div key={c.label} className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-5">
+            <div className="text-2xl sm:text-3xl font-bold text-zinc-100">{c.value}</div>
+            <div className="mt-1 text-xs sm:text-sm text-zinc-500">{c.label}</div>
           </div>
         ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
-        <div className="glass card-glow rounded-2xl p-6">
-          <h2 className="mb-4 text-lg font-semibold text-zinc-200">Пользователи</h2>
+      <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+        <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
+          <h2 className="mb-4 text-base sm:text-lg font-semibold text-zinc-200">Пользователи</h2>
           <div className="space-y-2">
             {users.map((u) => (
-              <div key={u.id} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 px-4 py-3">
+              <div key={u.id} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 px-3 sm:px-4 py-2.5 sm:py-3">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-zinc-200">{u.email}</div>
                   <div className="text-xs text-zinc-500">{new Date(u.createdAt).toLocaleDateString("ru-RU")} · {u.videoCount} видео</div>
                 </div>
-                <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${u.kind === "admin" ? "bg-amber-500/20 text-amber-400" : u.kind === "registered" ? "bg-indigo-500/20 text-indigo-400" : "bg-zinc-700/50 text-zinc-400"}`}>
+                <span className={`ml-2 shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium ${u.kind === "admin" ? "bg-amber-500/20 text-amber-400" : u.kind === "registered" ? "bg-indigo-500/20 text-indigo-400" : "bg-zinc-700/50 text-zinc-400"}`}>
                   {u.kind === "admin" ? "ADM" : u.kind === "registered" ? "USER" : "GUEST"}
                 </span>
               </div>
             ))}
           </div>
         </div>
-        <div className="glass card-glow rounded-2xl p-6">
-          <h2 className="mb-4 text-lg font-semibold text-zinc-200">Видео</h2>
+        <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
+          <h2 className="mb-4 text-base sm:text-lg font-semibold text-zinc-200">Видео</h2>
           <div className="space-y-2">
             {videos.map((v) => (
-              <a key={v.id} href={`/videos/${v.id}`} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 px-4 py-3 hover:bg-white/[0.04] transition">
+              <a key={v.id} href={`/videos/${v.id}`} className="flex items-center justify-between rounded-xl bg-white/[0.02] border border-white/5 px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-white/[0.04] transition">
                 <div className="min-w-0 flex-1">
                   <div className="truncate text-sm font-medium text-zinc-200">{v.title}</div>
                   <div className="text-xs text-zinc-500">{v.userEmail} · {Math.round(v.durationSec / 60)} мин · {v.clipCount} клипов</div>
