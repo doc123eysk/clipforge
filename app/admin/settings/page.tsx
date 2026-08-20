@@ -12,16 +12,18 @@ interface Settings {
   yandexKassa: { shopId: string; secretKey: string; enabled: boolean };
   s3: { endpoint: string; bucket: string; region: string; accessKey: string; secretKey: string; publicUrl: string; enabled: boolean };
   legal: { entityType: string; fullName: string; inn: string; ogrn: string; legalAddress: string; actualAddress: string; phone: string; email: string; bankName: string; bik: string; corrAccount: string; bankAccount: string };
+  social: { vkAppId: string; vkSecret: string; vkEnabled: boolean; youtubeClientId: string; youtubeClientSecret: string; youtubeEnabled: boolean; tiktokClientId: string; tiktokClientSecret: string; tiktokEnabled: boolean; instagramClientId: string; instagramClientSecret: string; instagramEnabled: boolean };
 }
 
 const DEFAULTS: Settings = {
   smtp: { host: "", port: "465", user: "", password: "", from: "", enabled: false },
-  limits: { maxVideoDurationFree: 600, maxVideoDurationPro: 7200, maxClipDuration: 60, maxClipsPerVideoFree: 6, maxClipsPerVideoPro: 50, guestDailyLimit: 6, guestVideoExpiryHours: 1 },
+  limits: { maxVideoDurationFree: 600, maxVideoDurationPro: 7200, maxClipDuration: 180, maxClipsPerVideoFree: 6, maxClipsPerVideoPro: 50, guestDailyLimit: 6, guestVideoExpiryHours: 1 },
   pricing: { monthlyPrice: 399, quarterlyDiscount: 10, halfyearDiscount: 15, yearlyDiscount: 30, promoCode: "", promoDiscount: 0, promoEnabled: false },
   general: { siteName: "ClipForge", supportEmail: "", maintenance: false },
   yandexKassa: { shopId: "", secretKey: "", enabled: false },
   s3: { endpoint: "", bucket: "", region: "ru-msk", accessKey: "", secretKey: "", publicUrl: "", enabled: false },
   legal: { entityType: "Индивидуальный предприниматель", fullName: "", inn: "", ogrn: "", legalAddress: "", actualAddress: "", phone: "", email: "", bankName: "", bik: "", corrAccount: "", bankAccount: "" },
+  social: { vkAppId: "", vkSecret: "", vkEnabled: false, youtubeClientId: "", youtubeClientSecret: "", youtubeEnabled: false, tiktokClientId: "", tiktokClientSecret: "", tiktokEnabled: false, instagramClientId: "", instagramClientSecret: "", instagramEnabled: false },
 };
 
 function Field({ label, value, onChange, type = "text", placeholder, secret }: {
@@ -177,6 +179,45 @@ export default function AdminSettingsPage() {
             <Field label="Корр. счёт" value={settings.legal.corrAccount} onChange={(v) => update("legal", "corrAccount", v)} placeholder="30101810400000000225" />
             <Field label="Расчётный счёт" value={settings.legal.bankAccount} onChange={(v) => update("legal", "bankAccount", v)} placeholder="40802810100000000001" />
           </div>
+        </Section>
+
+        <Section title="Социальные сети (OAuth)">
+          <p className="text-xs text-zinc-500 mb-2">Callback URL для всех: <code className="text-indigo-400">https://clip-forge.ru/api/social/{'{provider}'}/callback</code></p>
+
+          <Toggle label="VK" checked={settings.social.vkEnabled} onChange={(v) => update("social", "vkEnabled", v)} />
+          {settings.social.vkEnabled && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="App ID" value={settings.social.vkAppId} onChange={(v) => update("social", "vkAppId", v)} placeholder="51234567" />
+              <Field label="App Secret" value={settings.social.vkSecret} onChange={(v) => update("social", "vkSecret", v)} secret />
+            </div>
+          )}
+
+          <div className="border-t border-white/5 pt-4 mt-2" />
+          <Toggle label="YouTube" checked={settings.social.youtubeEnabled} onChange={(v) => update("social", "youtubeEnabled", v)} />
+          {settings.social.youtubeEnabled && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Client ID" value={settings.social.youtubeClientId} onChange={(v) => update("social", "youtubeClientId", v)} />
+              <Field label="Client Secret" value={settings.social.youtubeClientSecret} onChange={(v) => update("social", "youtubeClientSecret", v)} secret />
+            </div>
+          )}
+
+          <div className="border-t border-white/5 pt-4 mt-2" />
+          <Toggle label="TikTok" checked={settings.social.tiktokEnabled} onChange={(v) => update("social", "tiktokEnabled", v)} />
+          {settings.social.tiktokEnabled && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Client Key" value={settings.social.tiktokClientId} onChange={(v) => update("social", "tiktokClientId", v)} />
+              <Field label="Client Secret" value={settings.social.tiktokClientSecret} onChange={(v) => update("social", "tiktokClientSecret", v)} secret />
+            </div>
+          )}
+
+          <div className="border-t border-white/5 pt-4 mt-2" />
+          <Toggle label="Instagram" checked={settings.social.instagramEnabled} onChange={(v) => update("social", "instagramEnabled", v)} />
+          {settings.social.instagramEnabled && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Client ID" value={settings.social.instagramClientId} onChange={(v) => update("social", "instagramClientId", v)} />
+              <Field label="Client Secret" value={settings.social.instagramClientSecret} onChange={(v) => update("social", "instagramClientSecret", v)} secret />
+            </div>
+          )}
         </Section>
       </div>
       <div className="mt-6 sm:mt-8 flex justify-end">

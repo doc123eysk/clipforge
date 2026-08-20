@@ -12,6 +12,7 @@ const geist = Geist({ variable: "--font-geist", subsets: ["latin", "cyrillic"] }
 export const metadata: Metadata = {
   title: "ClipForge — нарезка видео на shorts",
   description: "Загрузите видео, нарежьте на короткие клипы и опубликуйте в соцсети",
+  icons: { icon: "/favicon.svg" },
 };
 
 export const viewport: Viewport = {

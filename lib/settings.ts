@@ -63,6 +63,20 @@ export interface AppSettings {
     corrAccount: string;
     bankAccount: string;
   };
+  social: {
+    vkAppId: string;
+    vkSecret: string;
+    vkEnabled: boolean;
+    youtubeClientId: string;
+    youtubeClientSecret: string;
+    youtubeEnabled: boolean;
+    tiktokClientId: string;
+    tiktokClientSecret: string;
+    tiktokEnabled: boolean;
+    instagramClientId: string;
+    instagramClientSecret: string;
+    instagramEnabled: boolean;
+  };
 }
 
 const DEFAULTS: AppSettings = {
@@ -102,6 +116,12 @@ const DEFAULTS: AppSettings = {
     corrAccount: "",
     bankAccount: "",
   },
+  social: {
+    vkAppId: "", vkSecret: "", vkEnabled: false,
+    youtubeClientId: "", youtubeClientSecret: "", youtubeEnabled: false,
+    tiktokClientId: "", tiktokClientSecret: "", tiktokEnabled: false,
+    instagramClientId: "", instagramClientSecret: "", instagramEnabled: false,
+  },
 };
 
 export async function getSettings(): Promise<AppSettings> {
@@ -124,6 +144,7 @@ export async function saveSettings(settings: Partial<AppSettings>): Promise<void
     yandexKassa: { ...current.yandexKassa, ...settings.yandexKassa },
     s3: { ...current.s3, ...settings.s3 },
     legal: { ...current.legal, ...settings.legal },
+    social: { ...current.social, ...settings.social },
   };
   await writeFile(SETTINGS_PATH, JSON.stringify(merged, null, 2));
 }
