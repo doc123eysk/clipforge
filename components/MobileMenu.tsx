@@ -14,7 +14,7 @@ export function MobileMenu({ email, kind }: Props) {
 
   return (
     <div className="md:hidden">
-      <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-400 hover:bg-white/5 hover:text-white transition" aria-label="Меню">
+      <button onClick={() => setOpen(!open)} className="flex h-10 w-10 items-center justify-center rounded-lg text-zinc-500 hover:bg-black/5 hover:text-zinc-900 transition" aria-label="Меню">
         {open ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         ) : (
@@ -22,13 +22,13 @@ export function MobileMenu({ email, kind }: Props) {
         )}
       </button>
       {open && (
-        <div className="absolute inset-x-0 top-full z-50 glass border-b border-white/5 animate-slide-up" style={{ animationDuration: "0.2s" }}>
+        <div className="absolute inset-x-0 top-full z-50 glass border-b border-black/5 animate-slide-up" style={{ animationDuration: "0.2s" }}>
           <div className="flex flex-col gap-1 px-4 py-4 text-sm">
-            <Link href="/" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Мои видео</Link>
-            <Link href="/schedule" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Расписание</Link>
-            <Link href="/pricing" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Тарифы</Link>
-            <Link href="/settings" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-400 transition hover:bg-white/5 hover:text-white">Настройки</Link>
-            <div className="mt-2 border-t border-white/5 pt-3">
+            <Link href="/" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-500 transition hover:bg-black/5 hover:text-zinc-900">Мои видео</Link>
+            <Link href="/schedule" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-500 transition hover:bg-black/5 hover:text-zinc-900">Расписание</Link>
+            <Link href="/pricing" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-500 transition hover:bg-black/5 hover:text-zinc-900">Тарифы</Link>
+            <Link href="/settings" onClick={() => setOpen(false)} className="rounded-lg px-4 py-3 text-zinc-500 transition hover:bg-black/5 hover:text-zinc-900">Настройки</Link>
+            <div className="mt-2 border-t border-black/5 pt-3">
               <AuthButton email={email} kind={kind} />
             </div>
           </div>

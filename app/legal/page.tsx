@@ -12,7 +12,7 @@ export default async function LegalPage() {
 
       <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6 space-y-4">
         <div>
-          <h2 className="text-sm font-semibold text-zinc-200 mb-3">Общая информация</h2>
+          <h2 className="text-sm font-semibold text-zinc-800 mb-3">Общая информация</h2>
           <div className="space-y-2 text-sm">
             <Row label="Наименование сервиса" value={settings.general.siteName || "ClipForge"} />
             <Row label="Тип лица" value={l.entityType || "—" } />
@@ -22,30 +22,30 @@ export default async function LegalPage() {
           </div>
         </div>
 
-        <div className="border-t border-white/5" />
+        <div className="border-t border-black/5" />
 
         <div>
-          <h2 className="text-sm font-semibold text-zinc-200 mb-3">Адреса</h2>
+          <h2 className="text-sm font-semibold text-zinc-800 mb-3">Адреса</h2>
           <div className="space-y-2 text-sm">
             <Row label="Юридический адрес" value={l.legalAddress || "—"} />
             <Row label="Фактический адрес" value={l.actualAddress || "—"} />
           </div>
         </div>
 
-        <div className="border-t border-white/5" />
+        <div className="border-t border-black/5" />
 
         <div>
-          <h2 className="text-sm font-semibold text-zinc-200 mb-3">Контакты</h2>
+          <h2 className="text-sm font-semibold text-zinc-800 mb-3">Контакты</h2>
           <div className="space-y-2 text-sm">
             <Row label="Телефон" value={l.phone || "—"} />
             <Row label="Email" value={l.email || "—"} />
           </div>
         </div>
 
-        <div className="border-t border-white/5" />
+        <div className="border-t border-black/5" />
 
         <div>
-          <h2 className="text-sm font-semibold text-zinc-200 mb-3">Банковские реквизиты</h2>
+          <h2 className="text-sm font-semibold text-zinc-800 mb-3">Банковские реквизиты</h2>
           <div className="space-y-2 text-sm">
             <Row label="Банк" value={l.bankName || "—"} />
             <Row label="БИК" value={l.bik || "—"} />
@@ -60,9 +60,9 @@ export default async function LegalPage() {
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 rounded-xl bg-white/[0.02] border border-white/5 px-3 sm:px-4 py-2.5">
-      <span className="text-zinc-400">{label}</span>
-      <span className="text-zinc-200 sm:text-right">{value}</span>
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 rounded-xl bg-black/[0.02] border border-black/5 px-3 sm:px-4 py-2.5">
+      <span className="text-zinc-500">{label}</span>
+      <span className="text-zinc-800 sm:text-right">{value}</span>
     </div>
   );
 }

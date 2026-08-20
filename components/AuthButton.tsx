@@ -31,14 +31,14 @@ export function AuthButton({ email: initialEmail, kind: initialKind }: Props) {
   if ((kind === "registered" || kind === "admin") && email) {
     const isAdmin = kind === "admin";
     return (
-      <div className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm ${isAdmin ? "border border-amber-500/20 bg-amber-500/10 text-amber-300" : "border border-white/10 bg-white/5 text-zinc-300"}`}>
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isAdmin ? "#fbbf24" : "#818cf8"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className={`flex items-center gap-2 rounded-xl px-3 py-2 text-sm ${isAdmin ? "bg-amber-50 border border-amber-200 text-amber-700" : "bg-black/[0.03] border border-black/5 text-zinc-500"}`}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={isAdmin ? "#f59e0b" : "#6366f1"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           {isAdmin
             ? <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             : <><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></>
           }
         </svg>
-        {isAdmin && <a href="/admin" className="hover:text-amber-200 transition">Админ</a>}
+        {isAdmin && <a href="/admin" className="hover:text-amber-600 transition">Админ</a>}
         <span className="hidden sm:inline">{email}</span>
       </div>
     );
@@ -84,7 +84,7 @@ export function AuthButton({ email: initialEmail, kind: initialKind }: Props) {
   function closeModal() { setOpen(false); setStep("email"); setCode(""); setInputEmail(""); }
 
   const modal = open && mounted ? createPortal(
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" onClick={closeModal}>
+    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/30 backdrop-blur-sm p-4" onClick={closeModal}>
       <div className="glass neon-border card-glow w-full max-w-sm rounded-3xl p-8 animate-scale-in" onClick={(e) => e.stopPropagation()}>
         <div className="mb-6 flex items-center gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500">
@@ -92,30 +92,30 @@ export function AuthButton({ email: initialEmail, kind: initialKind }: Props) {
               <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-zinc-100">Вход в ClipForge</h2>
+          <h2 className="text-xl font-bold text-zinc-900">Вход в ClipForge</h2>
         </div>
         {step === "email" ? (
           <div className="space-y-4">
             <input type="email" placeholder="your@email.com" value={inputEmail} onChange={(e) => setInputEmail(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleSendCode()}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
             <button onClick={handleSendCode} disabled={loading || !inputEmail} className="btn-primary w-full rounded-xl py-3.5 font-bold text-white disabled:opacity-50">
               {loading ? "Отправка..." : "Получить код"}
             </button>
           </div>
         ) : (
           <div className="space-y-4">
-            <p className="text-sm text-zinc-500">Код отправлен на <span className="text-zinc-300">{inputEmail}</span></p>
+            <p className="text-sm text-zinc-500">Код отправлен на <span className="text-zinc-800">{inputEmail}</span></p>
             <input type="text" placeholder="000000" value={code} onChange={(e) => setCode(e.target.value)} onKeyDown={(e) => e.key === "Enter" && handleVerify()}
-              className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3.5 text-center text-3xl tracking-[0.4em] font-mono text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" maxLength={6} autoFocus />
+              className="w-full rounded-xl border border-black/10 bg-white px-4 py-3.5 text-center text-3xl tracking-[0.4em] font-mono text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" maxLength={6} autoFocus />
             <button onClick={handleVerify} disabled={loading || code.length < 4} className="btn-primary w-full rounded-xl py-3.5 font-bold text-white disabled:opacity-50">
               {loading ? "Проверка..." : "Войти"}
             </button>
-            <button onClick={() => { setStep("email"); setCode(""); }} className="flex items-center justify-center gap-1.5 w-full text-sm text-zinc-500 hover:text-zinc-300 transition">
+            <button onClick={() => { setStep("email"); setCode(""); }} className="flex items-center justify-center gap-1.5 w-full text-sm text-zinc-400 hover:text-zinc-700 transition">
               Другой email
             </button>
           </div>
         )}
-        <button onClick={closeModal} className="mt-4 w-full text-sm text-zinc-600 hover:text-zinc-400 transition">Закрыть</button>
+        <button onClick={closeModal} className="mt-4 w-full text-sm text-zinc-400 hover:text-zinc-600 transition">Закрыть</button>
       </div>
     </div>,
     document.body

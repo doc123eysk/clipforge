@@ -12,44 +12,45 @@ body { font-family: var(--font-geist), sans-serif; }
 
 .bg-animated {
   position: fixed; inset: 0; z-index: -2;
-  background: linear-gradient(-45deg, #0a0015, #0f0c1e, #0c0a1a, #0a0015);
+  background: linear-gradient(-45deg, #f5f3ff, #f0eeff, #fdf2f8, #f8f7ff, #eff6ff);
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
 }
 @keyframes gradientShift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
 
 .orb {
-  position: fixed; border-radius: 50%; filter: blur(80px); z-index: -1; opacity: 0.4;
+  position: fixed; border-radius: 50%; filter: blur(100px); z-index: -1; opacity: 0.15;
   animation: orbFloat 20s ease-in-out infinite;
 }
-.orb-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(99,102,241,0.3), transparent); top: -100px; left: -100px; }
-.orb-2 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(168,85,247,0.25), transparent); bottom: -100px; right: -100px; animation-delay: -7s; }
-.orb-3 { width: 300px; height: 300px; background: radial-gradient(circle, rgba(236,72,153,0.2), transparent); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -14s; }
+.orb-1 { width: 500px; height: 500px; background: radial-gradient(circle, #818cf8, transparent 70%); top: -150px; left: -150px; }
+.orb-2 { width: 450px; height: 450px; background: radial-gradient(circle, #c084fc, transparent 70%); bottom: -150px; right: -150px; animation-delay: -7s; }
+.orb-3 { width: 400px; height: 400px; background: radial-gradient(circle, #f472b6, transparent 70%); top: 50%; left: 50%; transform: translate(-50%,-50%); animation-delay: -14s; }
 @keyframes orbFloat { 0%,100%{transform:translate(0,0)} 33%{transform:translate(30px,-30px)} 66%{transform:translate(-20px,20px)} }
 
 .glass {
-  background: rgba(15, 12, 30, 0.6);
+  background: rgba(255, 255, 255, 0.72);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
-.neon-border { border-color: rgba(129, 140, 248, 0.3); box-shadow: 0 0 20px rgba(129, 140, 248, 0.1), inset 0 0 20px rgba(129, 140, 248, 0.05); }
-.badge { background: rgba(129, 140, 248, 0.1); }
-.gradient-text { background: linear-gradient(135deg, #818cf8, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.neon-border { border-color: rgba(99, 102, 241, 0.4); box-shadow: 0 0 24px rgba(99, 102, 241, 0.12), inset 0 0 24px rgba(99, 102, 241, 0.04); }
+.badge { background: rgba(99, 102, 241, 0.1); }
+.gradient-text { background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 
 .card-glow {
   transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
 }
 .card-glow:hover {
   transform: translateY(-3px) scale(1.01);
-  box-shadow: 0 8px 30px rgba(129, 140, 248, 0.15);
-  border-color: rgba(129, 140, 248, 0.2);
+  box-shadow: 0 8px 30px rgba(99, 102, 241, 0.1);
+  border-color: rgba(99, 102, 241, 0.2);
 }
 
 .btn-primary {
   background: linear-gradient(135deg, #6366f1, #a855f7);
   transition: box-shadow 0.3s, transform 0.2s;
 }
-.btn-primary:hover { box-shadow: 0 4px 20px rgba(99,102,241,0.4); transform: translateY(-1px); }
+.btn-primary:hover { box-shadow: 0 4px 24px rgba(99,102,241,0.35); transform: translateY(-1px); }
 
 .animate-slide-up { animation: slideUp 0.5s ease-out both; }
 .delay-100 { animation-delay: 0.1s; }

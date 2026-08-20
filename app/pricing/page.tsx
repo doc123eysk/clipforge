@@ -17,9 +17,9 @@ export default async function PricingPage() {
       </div>
       <div className="grid gap-6 sm:gap-8 sm:grid-cols-2">
         <div className="glass card-glow rounded-2xl sm:rounded-3xl p-6 sm:p-8">
-          <h2 className="mb-2 text-xl font-bold text-zinc-200">Free</h2>
+          <h2 className="mb-2 text-xl font-bold text-zinc-800">Free</h2>
           <p className="mb-4 sm:mb-6 text-sm text-zinc-500">Для знакомства с сервисом</p>
-          <div className="mb-6 sm:mb-8"><span className="text-4xl sm:text-5xl font-bold text-zinc-300">0 ₽</span><span className="ml-2 text-sm text-zinc-600">навсегда</span></div>
+          <div className="mb-6 sm:mb-8"><span className="text-4xl sm:text-5xl font-bold text-zinc-400">0 ₽</span><span className="ml-2 text-sm text-zinc-400">навсегда</span></div>
           <ul className="mb-6 sm:mb-8 space-y-3">
             {[
               `Видео до ${Math.round(settings.limits.maxVideoDurationFree / 60)} мин`,
@@ -27,24 +27,24 @@ export default async function PricingPage() {
               `До ${settings.limits.maxClipDuration} сек каждый`,
               "Водяной знак",
             ].map((f, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm text-zinc-400">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-[10px]">✓</span>{f}
+              <li key={i} className="flex items-center gap-3 text-sm text-zinc-500">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-zinc-100 text-[10px] text-zinc-500">✓</span>{f}
               </li>
             ))}
           </ul>
-          <div className="rounded-xl bg-zinc-800/30 py-3 text-center text-sm text-zinc-500 border border-white/5">
+          <div className="rounded-xl bg-zinc-100 py-3 text-center text-sm text-zinc-500 border border-black/5">
             {!user.subscription?.plan || user.subscription.plan === "free" ? "Текущий" : "Переключиться"}
           </div>
         </div>
         <div className="relative glass neon-border card-glow rounded-2xl sm:rounded-3xl p-6 sm:p-8">
           <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 px-4 sm:px-5 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold text-white shadow-lg">ПОПУЛЯРНЫЙ</div>
-          <h2 className="mb-2 text-xl font-bold text-zinc-200">PRO</h2>
+          <h2 className="mb-2 text-xl font-bold text-zinc-800">PRO</h2>
           <p className="mb-4 sm:mb-6 text-sm text-zinc-500">Для профессионалов</p>
-          <div className="mb-3 sm:mb-4"><span className="text-4xl sm:text-5xl font-bold gradient-text">{p.monthlyPrice} ₽</span><span className="ml-2 text-sm text-zinc-600">/мес</span></div>
+          <div className="mb-3 sm:mb-4"><span className="text-4xl sm:text-5xl font-bold gradient-text">{p.monthlyPrice} ₽</span><span className="ml-2 text-sm text-zinc-400">/мес</span></div>
           <div className="mb-4 sm:mb-6 flex flex-wrap gap-2">
-            {p.quarterlyDiscount > 0 && <span className="rounded-full bg-indigo-500/10 border border-indigo-500/20 px-3 py-1 text-xs text-indigo-300">3 мес: −{p.quarterlyDiscount}%</span>}
-            {p.halfyearDiscount > 0 && <span className="rounded-full bg-purple-500/10 border border-purple-500/20 px-3 py-1 text-xs text-purple-300">6 мес: −{p.halfyearDiscount}%</span>}
-            {p.yearlyDiscount > 0 && <span className="rounded-full bg-pink-500/10 border border-pink-500/20 px-3 py-1 text-xs text-pink-300">12 мес: −{p.yearlyDiscount}%</span>}
+            {p.quarterlyDiscount > 0 && <span className="rounded-full bg-indigo-50 border border-indigo-200 px-3 py-1 text-xs text-indigo-600">3 мес: −{p.quarterlyDiscount}%</span>}
+            {p.halfyearDiscount > 0 && <span className="rounded-full bg-purple-50 border border-purple-200 px-3 py-1 text-xs text-purple-600">6 мес: −{p.halfyearDiscount}%</span>}
+            {p.yearlyDiscount > 0 && <span className="rounded-full bg-pink-50 border border-pink-200 px-3 py-1 text-xs text-pink-600">12 мес: −{p.yearlyDiscount}%</span>}
           </div>
           <ul className="mb-6 sm:mb-8 space-y-3">
             {[
@@ -54,8 +54,8 @@ export default async function PricingPage() {
               "Без водяного знака",
               "Приоритетная обработка",
             ].map((f, i) => (
-              <li key={i} className="flex items-center gap-3 text-sm text-zinc-400">
-                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-500/20 text-[10px] text-indigo-400">✓</span>{f}
+              <li key={i} className="flex items-center gap-3 text-sm text-zinc-500">
+                <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-indigo-100 text-[10px] text-indigo-600">✓</span>{f}
               </li>
             ))}
           </ul>

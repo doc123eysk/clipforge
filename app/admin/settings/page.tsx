@@ -32,10 +32,10 @@ function Field({ label, value, onChange, type = "text", placeholder, secret }: {
   const [show, setShow] = useState(false);
   return (
     <div>
-      <label className="mb-1.5 block text-xs font-medium text-zinc-400">{label}</label>
+      <label className="mb-1.5 block text-xs font-medium text-zinc-500">{label}</label>
       <input type={secret && !show ? "password" : type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder}
-        className="w-full rounded-xl border border-white/10 bg-white/5 px-3 sm:px-4 py-2.5 text-sm text-zinc-100 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
-      {secret && <button onClick={() => setShow(!show)} className="mt-1 text-xs text-zinc-500 hover:text-zinc-300">{show ? "Скрыть" : "Показать"}</button>}
+        className="w-full rounded-xl border border-black/10 bg-white px-3 sm:px-4 py-2.5 text-sm text-zinc-900 outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20" />
+      {secret && <button onClick={() => setShow(!show)} className="mt-1 text-xs text-zinc-400 hover:text-zinc-700">{show ? "Скрыть" : "Показать"}</button>}
     </div>
   );
 }
@@ -43,10 +43,10 @@ function Field({ label, value, onChange, type = "text", placeholder, secret }: {
 function Toggle({ label, checked, onChange }: { label: string; checked: boolean; onChange: (v: boolean) => void }) {
   return (
     <label className="flex cursor-pointer items-center gap-3">
-      <div className={`relative h-6 w-11 rounded-full transition ${checked ? "bg-indigo-500" : "bg-zinc-700"}`} onClick={() => onChange(!checked)}>
-        <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition ${checked ? "left-5" : "left-0.5"}`} />
+      <div className={`relative h-6 w-11 rounded-full transition ${checked ? "bg-indigo-500" : "bg-zinc-300"}`} onClick={() => onChange(!checked)}>
+        <div className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition shadow-sm ${checked ? "left-5" : "left-0.5"}`} />
       </div>
-      <span className="text-sm text-zinc-300">{label}</span>
+      <span className="text-sm text-zinc-700">{label}</span>
     </label>
   );
 }
@@ -54,7 +54,7 @@ function Toggle({ label, checked, onChange }: { label: string; checked: boolean;
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="glass card-glow rounded-xl sm:rounded-2xl p-4 sm:p-6">
-      <h2 className="mb-4 sm:mb-5 text-base sm:text-lg font-semibold text-zinc-200">{title}</h2>
+      <h2 className="mb-4 sm:mb-5 text-base sm:text-lg font-semibold text-zinc-800">{title}</h2>
       <div className="space-y-4">{children}</div>
     </div>
   );
@@ -88,8 +88,8 @@ export default function AdminSettingsPage() {
       <div className="mb-6 sm:mb-10 flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
         <h1 className="text-2xl sm:text-4xl font-bold"><span className="gradient-text">Настройки</span></h1>
         <div className="flex gap-2">
-          <Link href="/admin" className="rounded-xl border border-white/10 bg-white/5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-400 hover:text-white transition">Дашборд</Link>
-          <Link href="/admin/settings" className="rounded-xl bg-indigo-500/20 border border-indigo-500/30 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-indigo-300">Настройки</Link>
+          <Link href="/admin" className="rounded-xl border border-black/10 bg-black/5 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-zinc-500 hover:text-zinc-900 transition">Дашборд</Link>
+          <Link href="/admin/settings" className="rounded-xl bg-indigo-50 border border-indigo-200 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-indigo-700">Настройки</Link>
         </div>
       </div>
       <div className="space-y-4 sm:space-y-6">
@@ -182,7 +182,7 @@ export default function AdminSettingsPage() {
         </Section>
 
         <Section title="Социальные сети (OAuth)">
-          <p className="text-xs text-zinc-500 mb-2">Callback URL для всех: <code className="text-indigo-400">https://clip-forge.ru/api/social/{'{provider}'}/callback</code></p>
+          <p className="text-xs text-zinc-400 mb-2">Callback URL для всех: <code className="text-indigo-600">https://clip-forge.ru/api/social/{'{provider}'}/callback</code></p>
 
           <Toggle label="VK" checked={settings.social.vkEnabled} onChange={(v) => update("social", "vkEnabled", v)} />
           {settings.social.vkEnabled && (
@@ -192,7 +192,7 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          <div className="border-t border-white/5 pt-4 mt-2" />
+          <div className="border-t border-black/5 pt-4 mt-2" />
           <Toggle label="YouTube" checked={settings.social.youtubeEnabled} onChange={(v) => update("social", "youtubeEnabled", v)} />
           {settings.social.youtubeEnabled && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -201,7 +201,7 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          <div className="border-t border-white/5 pt-4 mt-2" />
+          <div className="border-t border-black/5 pt-4 mt-2" />
           <Toggle label="TikTok" checked={settings.social.tiktokEnabled} onChange={(v) => update("social", "tiktokEnabled", v)} />
           {settings.social.tiktokEnabled && (
             <div className="grid gap-4 sm:grid-cols-2">
@@ -210,7 +210,7 @@ export default function AdminSettingsPage() {
             </div>
           )}
 
-          <div className="border-t border-white/5 pt-4 mt-2" />
+          <div className="border-t border-black/5 pt-4 mt-2" />
           <Toggle label="Instagram" checked={settings.social.instagramEnabled} onChange={(v) => update("social", "instagramEnabled", v)} />
           {settings.social.instagramEnabled && (
             <div className="grid gap-4 sm:grid-cols-2">
