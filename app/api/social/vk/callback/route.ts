@@ -7,23 +7,24 @@ export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
   const code = searchParams.get("code");
   const user = await getCurrentUser();
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || "https://clip-forge.ru";
 
   if (!user.id) {
-    return NextResponse.redirect(new URL("/settings?error=not_auth", req.url));
+    return NextResponse.redirect(new URL("/settings?error=not_auth", origin));
   }
 
   if (!code) {
-    return NextResponse.redirect(new URL("/settings?error=no_code", req.url));
+    return NextResponse.redirect(new URL("/settings?error=no_code", origin));
   }
 
   const settings = await getSettings();
   const { vkAppId, vkSecret } = settings.social;
 
   if (!vkAppId || !vkSecret) {
-    return NextResponse.redirect(new URL("/settings?error=vk_not_configured", req.url));
+    return NextResponse.redirect(new URL("/settings?error=vk_not_configured", origin));
   }
 
-  const redirectUri = `${new URL(req.url).origin}/api/social/vk/callback`;
+  const redirectUri = `${origin}/api/social/vk/callback`;
 
   try {
     const tokenRes = await fetch(
@@ -33,7 +34,7 @@ export async function GET(req: Request) {
 
     if (tokenData.error) {
       console.error("[VK] Token error:", tokenData.error_description);
-      return NextResponse.redirect(new URL("/settings?error=vk_token_failed", req.url));
+      return NextResponse.redirect(new URL("/settings?error=vk_token_failed", origin));
     }
 
     const accessToken = tokenData.access_token;
@@ -63,9 +64,9 @@ export async function GET(req: Request) {
       },
     });
 
-    return NextResponse.redirect(new URL("/settings?connected=vk", req.url));
+    return NextResponse.redirect(new URL("/settings?connected=vk", origin));
   } catch (err: any) {
     console.error("[VK] Error:", err.message);
-    return NextResponse.redirect(new URL("/settings?error=vk_error", req.url));
+    return NextResponse.redirect(new URL("/settings?error=vk_error", origin));
   }
 }
