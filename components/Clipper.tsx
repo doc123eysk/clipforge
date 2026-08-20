@@ -77,8 +77,8 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   const addSegment = () => {
     if (segments.length >= maxClips) return;
     const last = segments[segments.length - 1];
-    const start = last ? Math.min(last.end + 1, dur - 1) : 0;
-    const end = Math.min(start + 10, dur);
+    const start = last ? last.end : 0;
+    const end = Math.min(start + 45, dur);
     const seg: Segment = { id: `seg-${Date.now()}`, start, end, color: COLORS[segments.length % COLORS.length] };
     setSegments([...segments, seg]);
     setActiveSeg(seg.id);
