@@ -1,29 +1,74 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/auth";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
 export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
   const user = await getCurrentUser();
-  if (!user.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  const clip = await prisma.clip.findUnique({ where: { id }, include: { video: true } });
-  if (!clip) return NextResponse.json({ error: "Not found" }, { status: 404 });
-  if (clip.video.userId !== user.id && user.kind !== "admin") {
-    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  if (!user.id) {
+    return NextResponse.json({ error: "not_auth" }, { status: 401 });
   }
 
-  const body = await _req.json();
-  const { provider, scheduledAt } = body;
+  const { id } = await params;
+  const clip = await prisma.clip.findUnique({ where: { id } });
+  if (!clip || clip.status !== "ready" || !clip.storageKey) {
+    return NextResponse.json({ error: "clip_not_ready" }, { status: 400 });
+  }
 
-  const publication = await prisma.publication.create({
-    data: {
-      clipId: id,
-      provider,
-      status: scheduledAt ? "scheduled" : "pending",
-      scheduledAt: scheduledAt ? new Date(scheduledAt) : null,
-    },
+  const connection = await prisma.socialConnection.findUnique({
+    where: { userId_provider: { userId: user.id, provider: "vk" } },
   });
+  if (!connection || connection.status !== "active" || !connection.token) {
+    return NextResponse.json({ error: "vk_not_connected" }, { status: 400 });
+  }
 
-  return NextResponse.json({ ok: true, publication });
+  try {
+    const filePath = join(process.cwd(), "storage", "clips", clip.storageKey);
+    const fileBuffer = await readFile(filePath);
+    const fileBlob = new Blob([fileBuffer], { type: "video/mp4" });
+
+    const saveRes = await fetch(
+      `https://api.vk.com/method/video.save?access_token=${connection.token}&v=5.199`
+    );
+    const saveData = await saveRes.json();
+
+    if (saveData.error) {
+      console.error("[VK] video.save error:", saveData.error);
+      return NextResponse.json({ error: saveData.error.error_msg || "vk_save_failed" }, { status: 500 });
+    }
+
+    const { upload_url, video_id, owner_id } = saveData.response;
+
+    const formData = new FormData();
+    formData.append("video_file", fileBlob, "clip.mp4");
+
+    const uploadRes = await fetch(upload_url, { method: "POST", body: formData });
+    const uploadText = await uploadRes.text();
+
+    if (!uploadRes.ok) {
+      console.error("[VK] Upload failed:", uploadText);
+      return NextResponse.json({ error: "vk_upload_failed" }, { status: 500 });
+    }
+
+    await prisma.publication.create({
+      data: {
+        clipId: clip.id,
+        provider: "vk",
+        remoteUrl: `https://vk.com/video${owner_id}_${video_id}`,
+        status: "published",
+        publishedAt: new Date(),
+      },
+    });
+
+    return NextResponse.json({
+      ok: true,
+      videoId: video_id,
+      ownerId: owner_id,
+      url: `https://vk.com/video${owner_id}_${video_id}`,
+    });
+  } catch (err: any) {
+    console.error("[VK] Publish error:", err.message);
+    return NextResponse.json({ error: "publish_failed" }, { status: 500 });
+  }
 }

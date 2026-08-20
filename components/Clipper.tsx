@@ -25,6 +25,8 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
   const [scrubbing, setScrubbing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [previewClip, setPreviewClip] = useState<Clip | null>(null);
+  const [publishing, setPublishing] = useState<string | null>(null);
+  const [published, setPublished] = useState<Record<string, string>>({});
   const rafRef = useRef<number>(0);
 
   const dur = video.durationSec;
@@ -169,6 +171,24 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
 
   const playheadPct = dur > 0 ? (currentTime / dur) * 100 : 0;
 
+  const publishToVK = async (clipId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setPublishing(clipId);
+    try {
+      const res = await fetch(`/api/clips/${clipId}/publish`, { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setPublished((prev) => ({ ...prev, [clipId]: data.url }));
+      } else {
+        alert(data.error === "vk_not_connected" ? "Сначала подключите VK в настройках" : "Ошибка публикации");
+      }
+    } catch {
+      alert("Сетевая ошибка");
+    } finally {
+      setPublishing(null);
+    }
+  };
+
   return (
     <div className="space-y-4 sm:space-y-6">
       <video ref={videoRef} src={`/api/videos/${video.id}/stream`} controls className="mx-auto max-h-[40vh] sm:max-h-[50vh] rounded-xl sm:rounded-2xl w-full" />
@@ -268,10 +288,27 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
                 <div className="p-2">
                   <p className="text-[10px] text-zinc-500">{formatDuration(clip.startSec)} - {formatDuration(clip.endSec)}</p>
                   {clip.status === "ready" && (
-                    <a href={`/api/clips/${clip.id}/preview`} download onClick={(e) => e.stopPropagation()} className="mt-1 flex items-center justify-center gap-1 rounded-lg bg-indigo-500/20 py-1 text-[10px] text-indigo-300 transition hover:bg-indigo-500/30">
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                      Скачать
-                    </a>
+                    <div className="mt-1 flex flex-col gap-1">
+                      <a href={`/api/clips/${clip.id}/preview`} download onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-lg bg-indigo-500/20 py-1 text-[10px] text-indigo-300 transition hover:bg-indigo-500/30">
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        Скачать
+                      </a>
+                      {published[clip.id] ? (
+                        <a href={published[clip.id]} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="flex items-center justify-center gap-1 rounded-lg bg-green-500/20 py-1 text-[10px] text-green-300 transition hover:bg-green-500/30">
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                          VK
+                        </a>
+                      ) : (
+                        <button
+                          onClick={(e) => publishToVK(clip.id, e)}
+                          disabled={publishing === clip.id}
+                          className="flex items-center justify-center gap-1 rounded-lg bg-[#4C75A3]/20 py-1 text-[10px] text-[#6d9fd4] transition hover:bg-[#4C75A3]/30 disabled:opacity-50"
+                        >
+                          <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.391 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.862-.525-2.049-1.714-1.033-1.01-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 10.857 4.03 8.57 4.03 8.096c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.678.864 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.721c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.253-1.406 2.151-3.574 2.151-3.574.119-.254.322-.491.763-.491h1.744c.525 0 .644.27.525.643-.22 1.017-2.354 4.031-2.354 4.031-.186.305-.254.44 0 .78.186.254.796.779 1.203 1.253.745.847 1.32 1.558 1.473 2.049.17.474-.085.717-.576.717z"/></svg>
+                          {publishing === clip.id ? "..." : "В VK"}
+                        </button>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
@@ -287,6 +324,13 @@ export function Clipper({ video, initialClips, maxClips }: Props) {
             <div className="absolute -bottom-12 left-0 right-0 flex items-center justify-between text-sm text-zinc-400">
               <span>{formatDuration(previewClip.startSec)} - {formatDuration(previewClip.endSec)}</span>
               <div className="flex gap-2">
+                {published[previewClip.id] ? (
+                  <a href={published[previewClip.id]} target="_blank" rel="noopener noreferrer" className="rounded-lg bg-green-500/20 px-3 py-1.5 text-xs text-green-300 transition hover:bg-green-500/30">VK</a>
+                ) : (
+                  <button onClick={(e) => publishToVK(previewClip.id, e)} disabled={publishing === previewClip.id} className="rounded-lg bg-[#4C75A3]/20 px-3 py-1.5 text-xs text-[#6d9fd4] transition hover:bg-[#4C75A3]/30 disabled:opacity-50">
+                    {publishing === previewClip.id ? "..." : "В VK"}
+                  </button>
+                )}
                 <a href={`/api/clips/${previewClip.id}/preview`} download className="rounded-lg bg-indigo-500/20 px-3 py-1.5 text-xs text-indigo-300 transition hover:bg-indigo-500/30">Скачать</a>
                 <button onClick={() => setPreviewClip(null)} className="rounded-lg bg-white/10 px-3 py-1.5 text-xs text-zinc-300 transition hover:bg-white/20">Закрыть</button>
               </div>
