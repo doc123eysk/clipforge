@@ -24,7 +24,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <div className="orb orb-2" />
         <div className="orb orb-3" />
 
-        <Toaster position="top-right" toastOptions={{
+        <Toaster position="top-right" containerStyle={{ zIndex: 200 }} toastOptions={{
           style: { background: "rgba(15,12,30,0.9)", color: "#e4e4e7", border: "1px solid rgba(255,255,255,0.08)", backdropFilter: "blur(20px)" },
         }} />
 

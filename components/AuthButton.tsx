@@ -78,7 +78,7 @@ export function AuthButton({ email: initialEmail, kind: initialKind }: Props) {
         Войти
       </button>
       {open && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setOpen(false)}>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setOpen(false)}>
           <div className="glass neon-border card-glow w-full max-w-sm rounded-3xl p-8 animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <div className="mb-6 flex items-center gap-3">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500">
