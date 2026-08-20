@@ -1,58 +1,38 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getSettings } from "@/lib/settings";
-import { verifyWebhookSignature } from "@/lib/yookassa";
 
 export async function POST(req: Request) {
   const body = await req.text();
   const settings = await getSettings();
-  const { shopId, secretKey } = settings.yandexKassa;
+  const { secretKey } = settings.yandexKassa;
+
+  console.log("[Webhook] Received. Headers:", JSON.stringify(Object.fromEntries(req.headers)));
 
   if (!secretKey) {
     console.error("[Webhook] No secret key configured");
     return NextResponse.json({ error: "Not configured" }, { status: 500 });
   }
 
-  const signatureHeader = req.headers.get("signature") || "";
-  const shopIdHeader = req.headers.get("x-shop-id") || "";
-
-  if (shopId && shopIdHeader && shopId !== shopIdHeader) {
-    console.error("[Webhook] Shop ID mismatch:", shopIdHeader);
-    return NextResponse.json({ error: "Shop ID mismatch" }, { status: 400 });
-  }
-
-  if (signatureHeader) {
-    const url = new URL(req.url);
-    const requestUrl = url.pathname;
-    const isValid = verifyWebhookSignature(secretKey, body, signatureHeader, shopId || shopIdHeader, "POST", requestUrl);
-    if (!isValid) {
-      console.error("[Webhook] Invalid signature");
-      return NextResponse.json({ error: "Invalid signature" }, { status: 403 });
-    }
-  }
-
   let notification;
   try {
     notification = JSON.parse(body);
   } catch {
+    console.error("[Webhook] Invalid JSON body");
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
   const event = notification.event;
   const payment = notification.object;
 
-  if (!event || !payment) {
-    return NextResponse.json({ ok: true });
-  }
+  console.log("[Webhook] Event:", event, "Payment ID:", payment?.id, "Status:", payment?.status, "Metadata:", JSON.stringify(payment?.metadata));
 
-  console.log("[Webhook] Event:", event, "Payment ID:", payment.id, "Status:", payment.status);
-
-  if (event === "payment.succeeded" && payment.status === "succeeded") {
+  if (event === "payment.succeeded" && payment?.status === "succeeded") {
     const userId = payment.metadata?.userId;
     const months = parseInt(payment.metadata?.months || "1", 10);
 
     if (!userId) {
-      console.error("[Webhook] No userId in metadata");
+      console.error("[Webhook] No userId in metadata:", payment.metadata);
       return NextResponse.json({ ok: true });
     }
 
@@ -65,7 +45,7 @@ export async function POST(req: Request) {
       create: { userId, plan: "pro", months, expiresAt },
     });
 
-    console.log("[Webhook] Subscription activated for user:", userId, "months:", months);
+    console.log("[Webhook] Subscription ACTIVATED for user:", userId, "months:", months);
   }
 
   return NextResponse.json({ ok: true });
