@@ -10,7 +10,12 @@ async function cleanupExpired() {
   for (const v of expired) {
     try { const { unlink } = await import("fs/promises"); const { join } = await import("path"); await unlink(join(process.cwd(), "storage", "uploads", v.storageKey)); } catch {}
   }
-  await prisma.video.deleteMany({ where: { expiresAt: { lt: new Date() } } });
+  const ids = expired.map((v) => v.id);
+  if (ids.length) {
+    await prisma.publication.deleteMany({ where: { clip: { videoId: { in: ids } } } });
+    await prisma.clip.deleteMany({ where: { videoId: { in: ids } } });
+    await prisma.video.deleteMany({ where: { id: { in: ids } } });
+  }
 }
 
 export default async function HomePage() {
